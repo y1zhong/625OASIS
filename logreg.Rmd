@@ -1,0 +1,133 @@
+```{r}
+library(ggplot2)
+library(glmnet)
+library(caret)
+library(dplyr)
+```
+
+```{r}
+#--------------------------------------------------------------------
+#   Select slice 88, create 3d array (176, 208, 198)
+#--------------------------------------------------------------------
+load("./data/img_list.rds")
+a = img_list[[1]]
+# dim(a) = c(176, 176 * 208)
+# a = t(a)
+# img = c()
+S.new <- array (NA, dim = c(176,208,length(img_list)))
+
+for (i in 1:length(img_list)){
+  a = img_list[[i]]
+  test = a[,,88]
+  S.new[,,i] = test
+}
+
+data = read.csv("./data/oasis_cross-sectional_filter.csv")
+labels = data$CDR
+```
+
+```{r}
+#--------------------------------------------------------------------
+#   Separate Train and Test Data 8:2
+#--------------------------------------------------------------------
+n = dim(S.new)[3]   #from n = 198
+num_lst = 1:n
+set.seed(123)
+random_sample <- createDataPartition(num_lst, p = 0.8, list = FALSE)
+
+train.X = S.new[,,random_sample]
+test.X = S.new[,,-random_sample]
+
+train.demo = data[random_sample,]
+test.demo = data[-random_sample,]
+
+train.Y = train.demo$CDR
+test.Y = test.demo$CDR
+```
+
+```{r}
+#--------------------------------------------------------------------
+#   Visualize data
+#--------------------------------------------------------------------
+for (i in 1:10){
+  image(train.X[,,i], col = gray((0:255/255)))
+}
+```
+```{r}
+summary(train.X)
+table(train.Y)
+```
+```{r}
+prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
+  dims = dim(images)
+  X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## 784 * n1 matrix
+  X.neg = t(matrix(images[,,labels %in% negLabel],nrow=dims[1]*dims[2])) ## 784 * n1 matrix
+  return(list(X=rbind(X.pos, X.neg),y = c(rep(1,nrow(X.pos)),rep(0,nrow(X.neg)))))
+}
+```
+
+```{r}
+trn = prep_binary_classification(train.X, train.Y, 1, 0)
+tst = prep_binary_classification(test.X, test.Y, 1, 0)
+## Check the dimensions of the data
+print(dim(trn$X))
+print(length(trn$y))
+print(dim(tst$X))
+print(length(tst$y))
+```
+
+```{r}
+#--------------------------------------------------------------------
+#   Ridge Regression
+#--------------------------------------------------------------------
+ridge.fit <- glmnet(tst$X, tst$y, family="binomial", alpha = 0)
+ridge.pred <- predict(ridge.fit, trn$X, type="response")
+print(data.frame(pred=as.integer(ridge.pred > 0.5), true=trn$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+```
+
+```{r}
+#--------------------------------------------------------------------
+#   Ridge Regression Plots
+#--------------------------------------------------------------------
+
+```
+```{r}
+#--------------------------------------------------------------------
+#   Ridge Regression
+#--------------------------------------------------------------------
+lasso.fit <- glmnet(tst$X, tst$y, family="binomial", alpha = 1)
+#print (lasso.fit)
+lasso.pred <- predict(lasso.fit, trn$X, type="response")
+print(data.frame(pred=as.integer(lasso.pred > 0.5), true=trn$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+plot(lasso.fit)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
