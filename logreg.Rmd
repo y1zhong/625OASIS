@@ -60,8 +60,8 @@ table(train.Y)
 ```{r}
 prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
   dims = dim(images)
-  X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## 784 * n1 matrix
-  X.neg = t(matrix(images[,,labels %in% negLabel],nrow=dims[1]*dims[2])) ## 784 * n1 matrix
+  X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## n1 * 36608
+  X.neg = t(matrix(images[,,labels %in% negLabel],nrow=dims[1]*dims[2])) ## n1 * 36608
   return(list(X=rbind(X.pos, X.neg),y = c(rep(1,nrow(X.pos)),rep(0,nrow(X.neg)))))
 }
 ```
