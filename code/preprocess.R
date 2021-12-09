@@ -13,15 +13,18 @@ data = data %>%
   filter(Age >= 60)
 write.csv(data, file = "../code/data/oasis_cross-sectional_filter.csv",row.names = F)
 
-id = data[data$Age>60, ]$ID
+id = data[data$Age>=60, ]$ID
 file_list <- list.files(pattern = "\\.hdr$")
 file_name <- sapply(file_list, function(x)str_sub(x,1,13))
 file_filter <- file_list[file_name %in% id]
 img_list = lapply(file_filter, function(x){
+  #readANALYZE(x)@.Data[,,,1]
   readANALYZE(x)@.Data
 })
+
 names(img_list) = sapply(file_filter, function(x)str_sub(x,1,13))
-save(img_list, file = "../code/data/img_list_4d.rds")
+#save(img_list, file = "../code/data/img_list_4d.rds")
+save(img_list, file = "../code/data/img_list.rds")
 a=img_list[[1]][150,,]
 # plot(img_list)
 # library(misc3d)

@@ -2,8 +2,10 @@
 # Data are between 0,1 (corresponding to 0 to 255 rescaled)
 library(keras)
 library(tensorflow)
+load("../code/data/img_list_4d.rds")
+mat <- matrix(unlist(img_list))
 train_x <- runif(10*100*100*100*1, 0, 1)
-train_x <- array_reshape(train_x, dim = c(10, 100, 100, 100, 1))
+train_x <- array_reshape(unlist(img_list), dim = c(196, 178, 208, 178, 1))
 
 # Outcome data, binary
 train_y <- to_categorical(sample(c(0,1), size = 10, replace = TRUE))
