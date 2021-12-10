@@ -10,7 +10,7 @@ library(dplyr)
 #   Select slice 88, create 3d array (176, 208, 198)
 #--------------------------------------------------------------------
 #setwd("/Users/ginj/Documents/GitHub/625OASIS")
-load("data/img_list.rds")
+load("../data/img_list.rds")
 a = img_list[[1]]
 # dim(a) = c(176, 176 * 208)
 # a = t(a)
