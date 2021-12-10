@@ -2,6 +2,7 @@ load("./data/img_list.rds")
 
 library(ggplot2)
 library(randomForest)
+library(klaR)
 library(MASS)
 library(e1071)
 library(caret)
@@ -50,6 +51,7 @@ tst_X <- predict(pca.X, newdata =tst$X)
 
 Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X)
 Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X)
+True_cdr = as.numeric(Testing_data$y)-1
 
 calc_acc = function(actual, predicted) {
   mean(actual == predicted)
@@ -61,26 +63,24 @@ ctrl <- trainControl(method = "cv", number=10, savePredictions=TRUE, classProbs=
 library(MASS)
 set.seed(123)
 lda.fit <-train(x = Training_data[,-1], y = Training_data$y, data = Training_data, method="sparseLDA",trControl=ctrl,tuneLength=10)
-
 #lda.Yhat = lda.fit$pred$pred
 lda.pred = predict(lda.fit, Testing_data)
 lda.TrainAcc = max(na.omit(lda.fit$results$Accuracy))
-lda.TrainAcc 
 lda.TestAcc = calc_acc(predicted = lda.pred, actual = Testing_data$y)
-lda.TestAcc 
+lda.cfmat = table(Prediction = lda.pred, Reference = True_cdr)
+lda.res = list(lda.fit=lda.fit,lda.TrainAcc=lda.TrainAcc,lda.TestAcc=lda.TestAcc,lda.cfmat=lda.cfmat)
+lda.res
 
-
-library(e1071)
 ## SVM with Linear Kernel
 set.seed(123)
 svm.lin.fit <- train(y~., data = Training_data, method = "svmLinear2", trControl = ctrl, tuneLength = 10)
-
 #svm.lin.Yhat = svm.lin.fit$pred[svm.lin.fit$results$cost == 0.5,]$pred
-
 svm.lin.TrainAcc = max(svm.lin.fit$results["Accuracy"])
 svm.lin.pred=predict(svm.lin.fit,Testing_data)
 svm.lin.TestAcc = calc_acc(predicted = svm.lin.pred, actual = Testing_data$y)
+svm.lin.cfmat = table(Prediction = svm.lin.pred, Reference = True_cdr)
 svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc)
+svm.lin.res 
 
 ## SVM with Radial Kernel
 set.seed(123)
@@ -89,8 +89,8 @@ svm.rad.fit <-train(y~., data = Training_data, method="svmRadial",trControl=ctrl
 svm.rad.TrainAcc = max(svm.rad.fit$results["Accuracy"])
 svm.rad.pred=predict(svm.rad.fit,Testing_data)
 svm.rad.TestAcc = calc_acc(predicted = svm.rad.pred, actual = Testing_data$y)
-
-svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc)
+svm.rad.cfmat = table(Prediction = svm.rad.pred, Reference = True_cdr)
+svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat)
 svm.rad.res
 
 # ## SVM with Polynomial Kernel
@@ -112,9 +112,20 @@ rf.fit <-train(y~., data = Training_data, method="rf",trControl=ctrl,tuneLength=
 rf.TrainAcc = max(rf.fit$results["Accuracy"])
 rf.pred=predict(rf.fit,Testing_data)
 rf.TestAcc = calc_acc(predicted = rf.pred, actual = Testing_data$y)
-
-rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc)
+rf.cfmat = table(Prediction = rf.pred, Reference = True_cdr)
+rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat)
 rf.res
+
+# ## Naive Bayes
+# set.seed(123)
+# nb.fit <-train(y~., data = Training_data, method="nb",trControl=ctrl,tuneLength=10)
+# 
+# nb.TrainAcc = max(nb.fit$results["Accuracy"])
+# nb.pred=predict(nb.fit,Testing_data)
+# nb.TestAcc = calc_acc(predicted = nb.pred, actual = Testing_data$y)
+# 
+# nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc)
+# nb.res
 
 result = list(svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res)
 
