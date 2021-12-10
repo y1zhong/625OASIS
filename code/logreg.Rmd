@@ -11,6 +11,8 @@ library(dplyr)
 #--------------------------------------------------------------------
 #setwd("/Users/ginj/Documents/GitHub/625OASIS")
 load("../data/img_list.rds")
+```
+```{r}
 a = img_list[[1]]
 # dim(a) = c(176, 176 * 208)
 # a = t(a)
@@ -28,7 +30,7 @@ for (i in 1:length(img_list)){
 #--------------------------------------------------------------------
 S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
 
-data = read.csv("./data/oasis_cross-sectional_filter.csv")
+data = read.csv("../data/oasis_cross-sectional_filter.csv")
 #data = oasis_cross_sectional_filter
 labels = data$CDR
 ```
