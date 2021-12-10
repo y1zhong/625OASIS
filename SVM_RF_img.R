@@ -60,29 +60,28 @@ svm.lin.pred=predict(svm.lin.fit,Testing_data)
 svm.lin.TestAcc = calc_acc(predicted = svm.lin.pred, actual = Testing_data$y)
 svm.lin.TestAcc
 
+svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc)
+
 ## SVM with Radial Kernel
 set.seed(123)
 svm.rad.fit <-train(y~., data = Training_data, method="svmRadial",trControl=ctrl,tuneLength=10)
-
 #svm.rad.Yhat = svm.rad.fit$pred[svm.rad.fit$results$C == 0.5,]$pred
-
 svm.rad.TrainAcc = max(svm.rad.fit$results["Accuracy"])
-svm.rad.TrainAcc
-
 svm.rad.pred=predict(svm.rad.fit,Testing_data)
-
 svm.rad.TestAcc = calc_acc(predicted = svm.rad.pred, actual = Testing_data$y)
-svm.rad.TestAcc
+
+svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc)
 
 ## Ramdom Forest
 set.seed(123)
 rf.fit <-train(y~., data = Training_data, method="rf",trControl=ctrl,tuneLength=10)
 
 rf.TrainAcc = max(rf.lin.fit$results["Accuracy"])
-rf.TrainAcc 
-
 rf.pred=predict(rf.fit,Testing_data)
-
 rf.TestAcc = calc_acc(predicted = rf.pred, actual = Testing_data$y)
-rf.TestAcc
 
+rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc)
+
+result = list(svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res)
+
+save(result, file ="SVM_RF_result.rds")
