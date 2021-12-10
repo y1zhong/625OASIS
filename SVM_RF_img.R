@@ -54,12 +54,8 @@ svm.lin.fit <- train(y~., data = Training_data, method = "svmLinear2", trControl
 #svm.lin.Yhat = svm.lin.fit$pred[svm.lin.fit$results$cost == 0.5,]$pred
 
 svm.lin.TrainAcc = max(svm.lin.fit$results["Accuracy"])
-svm.lin.TrainAcc 
-
 svm.lin.pred=predict(svm.lin.fit,Testing_data)
 svm.lin.TestAcc = calc_acc(predicted = svm.lin.pred, actual = Testing_data$y)
-svm.lin.TestAcc
-
 svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc)
 
 ## SVM with Radial Kernel
