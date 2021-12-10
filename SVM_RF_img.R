@@ -34,8 +34,6 @@ test.demo = data[-random_sample,]
 train.Y = as.numeric(train.demo$CDR)-1
 test.Y = as.numeric(test.demo$CDR)-1
 
-
-
 prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
   dims = dim(images)
   X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## n1 * 36608
