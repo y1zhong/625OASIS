@@ -9,7 +9,8 @@ library(dplyr)
 #--------------------------------------------------------------------
 #   Select slice 88, create 3d array (176, 208, 198)
 #--------------------------------------------------------------------
-load("./data/img_list.rds")
+#setwd("/Users/ginj/Documents/GitHub/625OASIS")
+load("data/img_list.rds")
 a = img_list[[1]]
 # dim(a) = c(176, 176 * 208)
 # a = t(a)
@@ -22,7 +23,13 @@ for (i in 1:length(img_list)){
   S.new[,,i] = test
 }
 
+#--------------------------------------------------------------------
+#   Remove rows and columns with all 0
+#--------------------------------------------------------------------
+S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
+
 data = read.csv("./data/oasis_cross-sectional_filter.csv")
+#data = oasis_cross_sectional_filter
 labels = data$CDR
 ```
 
@@ -60,8 +67,8 @@ table(train.Y)
 ```{r}
 prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
   dims = dim(images)
-  X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## n1 * 36608
-  X.neg = t(matrix(images[,,labels %in% negLabel],nrow=dims[1]*dims[2])) ## n1 * 36608
+  X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## n1 * (137*169)
+  X.neg = t(matrix(images[,,labels %in% negLabel],nrow=dims[1]*dims[2])) ## n1 * (137*169)
   return(list(X=rbind(X.pos, X.neg),y = c(rep(1,nrow(X.pos)),rep(0,nrow(X.neg)))))
 }
 ```
@@ -74,6 +81,10 @@ print(dim(trn$X))
 print(length(trn$y))
 print(dim(tst$X))
 print(length(tst$y))
+
+combined = prep_binary_classification (S.new, data$CDR, 1, 0)
+print (dim(combined$X))
+print (length(combined$y))
 ```
 
 ```{r}
@@ -81,8 +92,13 @@ print(length(tst$y))
 #   Ridge Regression
 #--------------------------------------------------------------------
 ridge.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 0)
-ridge.pred <- predict(ridge.fit, tst$X, type="response")
-print(data.frame(pred=as.integer(ridge.pred > 0.5), true=tst$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+# ridge.pred.trn <- predict(ridge.fit, trn$X, type="response")
+ridge.pred.tst <- predict(ridge.fit, tst$X, type="response")
+# print(data.frame(pred=as.integer(ridge.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #train data
+print(data.frame(pred=as.integer(ridge.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #test data
+
+plot(ridge.fit)
+
 ```
 
 ```{r}
@@ -91,20 +107,29 @@ print(data.frame(pred=as.integer(ridge.pred > 0.5), true=tst$y) %>% count(true,p
 #--------------------------------------------------------------------
 
 ```
+
 ```{r}
 #--------------------------------------------------------------------
-#   Ridge Regression
+#   Lasso Regression
 #--------------------------------------------------------------------
 
 lasso.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 1)
 #print (lasso.fit)
-lasso.pred <- predict(lasso.fit, tst$X, type="response")
-print(data.frame(pred=as.integer(lasso.pred > 0.5), true=tst$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+# lasso.pred.trn <- predict(lasso.fit, trn$X, type="response")
+lasso.pred.tst <- predict(lasso.fit, tst$X, type="response")
+# print(data.frame(pred=as.integer(lasso.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+print(data.frame(pred=as.integer(lasso.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+
 plot(lasso.fit)
 
 ```
+```{r}
+#--------------------------------------------------------------------
+#   Cross Validation Ridge
+#--------------------------------------------------------------------
+cv.fit = cv.glmnet(combined$X, combined$y, nfolds=10)
 
-
+```
 
 
 
