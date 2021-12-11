@@ -1,4 +1,4 @@
-load("./data/img_list.rds")
+load("../data/img_list.rds")
 
 library(ggplot2)
 library(randomForest)
@@ -16,7 +16,7 @@ for (i in 1:length(img_list)){
   S.new[,,i] = test
 }
 
-data = read.csv("./data/oasis_cross-sectional_filter.csv")
+data = read.csv("../data/oasis_cross-sectional_filter.csv")
 labels = data$CDR
 
 n = nrow(S.new)
