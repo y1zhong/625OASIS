@@ -3,13 +3,14 @@ library(ggplot2)
 library(glmnet)
 library(caret)
 library(dplyr)
+library(knitr)
 ```
 
 ```{r}
 #--------------------------------------------------------------------
 #   Select slice 88, create 3d array (176, 208, 198)
 #--------------------------------------------------------------------
-#setwd("/Users/ginj/Documents/GitHub/625OASIS")
+setwd("/Users/ginj/Documents/GitHub/625OASIS")
 load("data/img_list.rds")
 a = img_list[[1]]
 # dim(a) = c(176, 176 * 208)
@@ -27,8 +28,8 @@ for (i in 1:length(img_list)){
 #   Remove rows and columns with all 0
 #--------------------------------------------------------------------
 S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
-
-data = read.csv("./data/oasis_cross-sectional_filter.csv")
+setwd("/Users/ginj/Documents/GitHub/625OASIS")
+data = read.csv("data/oasis_cross-sectional_filter.csv")
 #data = oasis_cross_sectional_filter
 labels = data$CDR
 ```
@@ -86,51 +87,82 @@ combined = prep_binary_classification (S.new, data$CDR, 1, 0)
 print (dim(combined$X))
 print (length(combined$y))
 ```
+```{r}
+#--------------------------------------------------------------------
+#   Cross Validation Ridge
+#--------------------------------------------------------------------
+cv.fit = cv.glmnet(combined$X, combined$y, family = "binomial", 
+                   alpha = 0, 
+                   standardize = FALSE, keep = TRUE)
+#cbind(cv.fit$lambda, cv.fit$cvm)
+best_param = cv.fit$lambda.min   #best parameter
+best_coef = coef(cv.fit, s = "lambda.min")
+
+```
 
 ```{r}
 #--------------------------------------------------------------------
 #   Ridge Regression
 #--------------------------------------------------------------------
-ridge.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 0)
+ridge.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 0, lambda = best_param)
 # ridge.pred.trn <- predict(ridge.fit, trn$X, type="response")
 ridge.pred.tst <- predict(ridge.fit, tst$X, type="response")
 # print(data.frame(pred=as.integer(ridge.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #train data
-print(data.frame(pred=as.integer(ridge.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #test data
+kable(data.frame(pred=as.integer(ridge.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #test data
 
+confusion.glmnet(ridge.fit, newx = tst$X, newy = tst$y)
 plot(ridge.fit)
 
+
 ```
+
 
 ```{r}
 #--------------------------------------------------------------------
-#   Ridge Regression Plots
+#   Cross Validation Ridge
 #--------------------------------------------------------------------
+cv.fit2 = cv.glmnet(combined$X, combined$y, family = "binomial", 
+                   alpha = 1, 
+                   standardize = FALSE, keep = TRUE)
+#cbind(cv.fit$lambda, cv.fit$cvm)
+best_param2 = cv.fit2$lambda.min   #best parameter
+best_coef2 = coef(cv.fit2, s = "lambda.min")
 
 ```
-
 ```{r}
 #--------------------------------------------------------------------
 #   Lasso Regression
 #--------------------------------------------------------------------
 
-lasso.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 1)
+lasso.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 1, lambda = best_param2)
 #print (lasso.fit)
 # lasso.pred.trn <- predict(lasso.fit, trn$X, type="response")
 lasso.pred.tst <- predict(lasso.fit, tst$X, type="response")
 # print(data.frame(pred=as.integer(lasso.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
-print(data.frame(pred=as.integer(lasso.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+kable(data.frame(pred=as.integer(lasso.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
 
 plot(lasso.fit)
 
+
+
 ```
+
+
 ```{r}
 #--------------------------------------------------------------------
-#   Cross Validation Ridge
+#   Cross Validation Plots
 #--------------------------------------------------------------------
-cv.fit = cv.glmnet(combined$X, combined$y, nfolds=10)
+idmin = match(cv.fit$lambda.min, cv.fit$lambda)
+idmin2 = match(cv.fit2$lambda.min, cv.fit2$lambda)
+
+
+plot(roc.glmnet(cv.fit$fit.preval, newy = combined$y)[[idmin]])
+plot(roc.glmnet(cv.fit2$fit.preval, newy = combined$y)[[idmin2]])
+
+confusion.glmnet(ridge.fit, newx = tst$X, newy = tst$y, s = 0.1)
+confusion.glmnet(lasso.fit, newx = tst$X, newy = tst$y, s = 0.01)
 
 ```
-
 
 
 
