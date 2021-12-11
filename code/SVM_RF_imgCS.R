@@ -7,6 +7,7 @@ library(MASS)
 library(e1071)
 library(caret)
 library(dplyr)
+library(mice)
 
 S.new <- array (NA, dim = c(176,208,length(img_list)))
 
@@ -17,7 +18,13 @@ for (i in 1:length(img_list)){
 }
 
 data = read.csv("./data/oasis_cross-sectional_filter.csv")
-labels = data$CDR
+oasis_f = data[,c(1,2,4:10)]
+set.seed(123)
+pos = sample(1:5,1)
+mi.oasis_f = mice(oasis_f, m=5, printFlag =FALSE)
+mi.temp.oasis_f = complete(mi.oasis_f,"all")
+oasis_csdt = mi.temp.oasis_f[[pos]][,c(2:5,7)]
+labels = oasis_csdt$CDR
 
 n = nrow(S.new)
 num_lst = 1:n
@@ -27,11 +34,11 @@ random_sample <- createDataPartition(num_lst, p = 0.8, list = FALSE)
 train.X = S.new[,,random_sample]
 test.X = S.new[,,-random_sample]
 
-data$CDR = as.factor(data$CDR)
-levels(data$CDR) <- c("EqaulTo0", "LargeThan0")
+oasis_csdt$CDR = as.factor(oasis_csdt$CDR)
+levels(oasis_csdt$CDR) <- c("EqaulTo0", "LargeThan0")
 
-train.demo = data[random_sample,]
-test.demo = data[-random_sample,]
+train.demo = oasis_csdt[random_sample,]
+test.demo = oasis_csdt[-random_sample,]
 train.Y = as.numeric(train.demo$CDR)-1
 test.Y = as.numeric(test.demo$CDR)-1
 
@@ -49,8 +56,8 @@ pca.X =prcomp(trn$X)
 trn_X <- predict(pca.X, newdata = trn$X)
 tst_X <- predict(pca.X, newdata =tst$X)
 
-Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X)
-Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X)
+Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X, train.demo[,c(1:4)])
+Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X,test.demo[,c(1:4)])
 True_cdr = as.numeric(Testing_data$y)-1
 
 calc_acc = function(actual, predicted) {
@@ -79,7 +86,7 @@ svm.lin.TrainAcc = max(svm.lin.fit$results["Accuracy"])
 svm.lin.pred=predict(svm.lin.fit,Testing_data)
 svm.lin.TestAcc = calc_acc(predicted = svm.lin.pred, actual = Testing_data$y)
 svm.lin.cfmat = table(Prediction = svm.lin.pred, Reference = True_cdr)
-svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc,svm.lin.cfmat= svm.lin.cfmat)
+svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc,svm.lin.cfmat=svm.lin.cfmat)
 svm.lin.res 
 
 ## SVM with Radial Kernel
@@ -136,6 +143,6 @@ CDR_acc = data.frame(
 )
 knitr::kable(CDR_acc)
 
-SVM_RF_ImgOnly_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,CDR_acc=CDR_acc)
+SVM_RF_ImgCS_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,CDR_acc=CDR_acc)
 
-save(SVM_RF_ImgOnly_result, file ="./result/SVM_RF_ImgOnly_result.Rdata")
+save(SVM_RF_ImgCS_result, file ="./result/SVM_RF_ImgCS_result.Rdata")
