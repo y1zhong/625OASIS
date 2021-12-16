@@ -1,30 +1,30 @@
 ---
-title: "Biostat625_Final"
+title: "Predicting Dementia Diagnosis with Neuroimaging Data"
 author: "Boya Jiang,Chen Chen,Tiankai Xie,Yuan Zhong"
 date: "12/15/2021"
 output: pdf_document
 ---
+# Introduction  
+Alzheimer’s is a dementia degenerative disease starting with mild memory impairment in the early stages and progressing to a complete loss of the mental and physical faculties. Definitive Alzheimer's Disease (AD) diagnosis relies on a magnetic resonance image (MRI) study. Brain MRI scans are detailed three-dimensional anatomical images, and changes in the hippocampus, frontal and parietal regions are evidential markers in the progress of AD. The ability to diagnose and classify AD at an early stage allows clinicians to make more knowledgeable decisions regarding clinical interventions. In this project, we apply multiple representative methods to predict Alzheimer's status.  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Data and Preprocessing
+OASIS (Open Access Series of Imaging Studies) is a well-known initiative that is publicly available for study and analysis. The present MRI dataset, OASIS-I (presented in 2007), is a cross-sectional collection of data for 416 participants aged 18-96yrs, 316 non-demented and 100 at various stages of AD. Subjects were characterized by the Clinical Dementia Rating (CDR) scale from cognitive normal (CDR 0), 0.5 (very-mild dementia) to mild dementia (CDR 1). The data set also contains the following demographics information: male/female, age, education (Educ), and socioeconomic status (SES). Data set of MRI contains 176 slices/images of 176 x 208 pixel size.  
 
-## R Markdown
+Since AD is more prevalent among older adults, we selected individuals with age over 60 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Methods and Results
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Conclusion and Discussion
 
-```{r cars}
-summary(cars)
-```
+# Deliverable and Code Repository
+Shiny App:   
+GitHub:   
+Google Colab?  
 
-## Including Plots
+# Contributions
 
-You can also embed plots, for example:
+# References
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
