@@ -1,58 +1,53 @@
 ```{r}
 library(ggplot2)
 library(glmnet)
-library(caret)
 library(dplyr)
 library(knitr)
+library(caret)
+library(tictoc)
 ```
 
 ```{r}
 #--------------------------------------------------------------------
 #   Select slice 88, create 3d array (176, 208, 198)
 #--------------------------------------------------------------------
-setwd("/Users/ginj/Documents/GitHub/625OASIS")
+setwd("~/Documents/GitHub/625OASIS")
 load("data/img_list.rds")
-a = img_list[[1]]
-# dim(a) = c(176, 176 * 208)
-# a = t(a)
-# img = c()
-S.new <- array (NA, dim = c(176,208,length(img_list)))
+a = img_list[[1]]                           #read in 3D array 176x208x176
+S.new <- array (NA, dim = c(176, 208, length(img_list)))
 
-for (i in 1:length(img_list)){
+for (i in 1 : length(img_list)){            #select slice 88 and create array 176x208x198
   a = img_list[[i]]
-  test = a[,,88]
-  S.new[,,i] = test
+  test = a[, , 88]
+  S.new[, , i] = test
 }
 
 #--------------------------------------------------------------------
 #   Remove rows and columns with all 0
 #--------------------------------------------------------------------
-S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
-setwd("/Users/ginj/Documents/GitHub/625OASIS")
-data = read.csv("data/oasis_cross-sectional_filter.csv")
-#data = oasis_cross_sectional_filter
-labels = data$CDR
-
-
+S.new =  S.new[apply(S.new != 0, 1, any),   #137x169x198
+               apply(S.new != 0, 2, any), ]
+load("~/Documents/GitHub/625OASIS/data/oasis_csdt.Rdata")
+labels = oasis_csdt$CDR
 ```
 
 ```{r}
 #--------------------------------------------------------------------
-#   Separate Train and Test Data 8:2
+#   Partition Train and Test Data 8:2
 #--------------------------------------------------------------------
 n = dim(S.new)[3]   #from n = 198
 num_lst = 1:n
 set.seed(123)
 random_sample <- createDataPartition(num_lst, p = 0.8, list = FALSE)
 
-train.X = S.new[,,random_sample]
-test.X = S.new[,,-random_sample]
+train.X = S.new[, , random_sample]
+test.X  = S.new[, , - random_sample]
 
-train.demo = data[random_sample,]
-test.demo = data[-random_sample,]
+train.demo = oasis_csdt[random_sample, ]
+test.demo  = oasis_csdt[ - random_sample, ]
 
 train.Y = train.demo$CDR
-test.Y = test.demo$CDR
+test.Y  = test.demo$CDR
 ```
 
 ```{r}
@@ -60,7 +55,7 @@ test.Y = test.demo$CDR
 #   Visualize Image
 #--------------------------------------------------------------------
 for (i in c(1, 3)){
-  image(train.X[,,i])
+  image(train.X[, , i])
 }
 ```
 ```{r}
@@ -68,37 +63,42 @@ table(train.Y)
 table(test.Y)
 ```
 ```{r}
+#return 2D array
 prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
   dims = dim(images)
-  X.pos = t(matrix(images[,,labels %in% posLabel],nrow=dims[1]*dims[2])) ## n1 * (137*169)
-  X.neg = t(matrix(images[,,labels %in% negLabel],nrow=dims[1]*dims[2])) ## n1 * (137*169)
-  return(list(X=rbind(X.pos, X.neg),y = c(rep(1,nrow(X.pos)),rep(0,nrow(X.neg)))))
+  X.pos = t( matrix(images[, , labels %in% posLabel], nrow=dims[1] * dims[2]) ) ## n1 x (137x169)
+  X.neg = t( matrix(images[, , labels %in% negLabel], nrow=dims[1] * dims[2]) ) ## n1 x (137x169)
+  return( list(X=rbind(X.pos, X.neg),
+              y = c(rep(1,nrow(X.pos)), rep(0,nrow(X.neg)))))
 }
 ```
 
 ```{r}
 trn = prep_binary_classification(train.X, train.Y, 1, 0)
 tst = prep_binary_classification(test.X, test.Y, 1, 0)
-## Check the dimensions of the data
-print(dim(trn$X))
-print(length(trn$y))
-print(dim(tst$X))
-print(length(tst$y))
 
-combined = prep_binary_classification (S.new, data$CDR, 1, 0)
-print (dim(combined$X))
-print (length(combined$y))
+## Check the dimensions of the data
+print( dim(trn$X) )
+print( length(trn$y) )
+print( dim(tst$X) )
+print( length(tst$y) )
+
+#prepare whole data for cross-validation
+combined = prep_binary_classification (S.new, oasis_csdt$CDR, 1, 0)
+print( dim(combined$X) ) 
+print( length(combined$y) )
 ```
 ```{r}
 #--------------------------------------------------------------------
 #   Cross Validation Ridge
 #--------------------------------------------------------------------
+tic()
 cv.fit.ridge = cv.glmnet(combined$X, combined$y, family = "binomial", 
                    alpha = 0, 
                    standardize = FALSE, keep = TRUE)
-#cbind(cv.fit.ridge$lambda, cv.fit.ridge$cvm)
-param.ridge = cv.fit.ridge$lambda.min   #best parameter
-coef.ridge = coef(cv.fit.ridge, s = "lambda.min")
+param.ridge = cv.fit.ridge$lambda.min             #best lambda parameter
+coef.ridge  = coef(cv.fit.ridge, s = "lambda.min")
+toc()
 
 ```
 
@@ -106,14 +106,15 @@ coef.ridge = coef(cv.fit.ridge, s = "lambda.min")
 #--------------------------------------------------------------------
 #   Ridge Regression
 #--------------------------------------------------------------------
-ridge.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 0, lambda = param.ridge)
-# ridge.pred.trn <- predict(ridge.fit, trn$X, type="response")
-ridge.pred.tst <- predict(ridge.fit, tst$X, type="response")
-# print(data.frame(pred=as.integer(ridge.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #train data
-kable(data.frame(pred=as.integer(ridge.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #test data
+tic()
+ridge.fit <- glmnet(trn$X, trn$y, family = "binomial", alpha = 0, lambda = param.ridge)
+ridge.pred.tst <- predict(ridge.fit, tst$X, type = "response")
+kable(data.frame(pred = as.integer(ridge.pred.tst > 0.5), true = tst$y) %>% count(true, pred) %>%
+        mutate(freq = n / sum(n)))      #test data
+toc()
 
 confusion.ridge <- confusion.glmnet(ridge.fit, newx = tst$X, newy = tst$y)
-
+confusion.ridge
 ```
 
 
@@ -121,27 +122,28 @@ confusion.ridge <- confusion.glmnet(ridge.fit, newx = tst$X, newy = tst$y)
 #--------------------------------------------------------------------
 #   Cross Validation Lasso
 #--------------------------------------------------------------------
+tic()
 cv.fit.lasso = cv.glmnet(combined$X, combined$y, family = "binomial", 
                    alpha = 1, 
                    standardize = FALSE, keep = TRUE)
-#cbind(cv.fit.lasso$lambda, cv.fit.lasso$cvm)
 param.lasso = cv.fit.lasso$lambda.min   #best parameter
 coef.lasso = coef(cv.fit.lasso, s = "lambda.min")
-
+toc()
 ```
 
 ```{r}
 #--------------------------------------------------------------------
 #   Lasso Regression
 #--------------------------------------------------------------------
-lasso.fit <- glmnet(trn$X, trn$y, family="binomial", alpha = 1, lambda = param.lasso)
-#print (lasso.fit)
-# lasso.pred.trn <- predict(lasso.fit, trn$X, type="response")
-lasso.pred.tst <- predict(lasso.fit, tst$X, type="response")
-# print(data.frame(pred=as.integer(lasso.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
-kable(data.frame(pred=as.integer(lasso.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>% mutate(freq=n/sum(n)))
+tic()
+lasso.fit <- glmnet(trn$X, trn$y, family = "binomial", alpha = 1, lambda = param.lasso)
+lasso.pred.tst <- predict(lasso.fit, tst$X, type = "response")
+kable(data.frame(pred = as.integer(lasso.pred.tst > 0.5), true=tst$y) %>% count(true, pred) %>% 
+        mutate(freq = n / sum(n)))
+toc()
 
 confusion.lasso <- confusion.glmnet(lasso.fit, newx = tst$X, newy = tst$y)
+confusion.lasso
 ```
 
 
@@ -158,9 +160,6 @@ roc.lasso = roc.glmnet(cv.fit.lasso$fit.preval, newy = combined$y)[[idmin.lasso]
 plot(roc.ridge)
 plot(roc.lasso)
 
-confusion.glmnet(ridge.fit, newx = tst$X, newy = tst$y, s = 0.1)
-confusion.glmnet(lasso.fit, newx = tst$X, newy = tst$y, s = 0.1)
-
 ```
 
 ```{r}
@@ -175,13 +174,13 @@ With Demographics
 
 ```{r}
 #remove CDR from data
-train.demo2 = subset(train.demo, select = -c(ID, Hand, CDR,SES,Delay))
-test.demo2 = subset(test.demo, select = -c(ID, Hand, CDR,SES,Delay))
-data2 = subset(data, select = -c(ID, Hand, CDR,SES,Delay))
+train.demo2 = subset(train.demo, select = -c(CDR))
+test.demo2 = subset(test.demo, select = -c(CDR))
+data2 = subset(oasis_csdt, select = -c(CDR))
 
 train.demo2$M.F = ifelse(train.demo2$M.F == "F", 1, 0)
-test.demo2$M.F = ifelse(test.demo2$M.F == "F", 1, 0)
-data2$M.F = ifelse(data2$M.F == "F", 1, 0)
+test.demo2$M.F  = ifelse(test.demo2$M.F == "F", 1, 0)
+data2$M.F       = ifelse(data2$M.F == "F", 1, 0)
 
 demo.trn.X = data.matrix( cbind(train.demo2, trn$X) )
 demo.tst.X = data.matrix( cbind(test.demo2, tst$X) )
@@ -196,37 +195,115 @@ print (dim(demo.combined.X))
 #--------------------------------------------------------------------
 #   Cross Validation Ridge
 #--------------------------------------------------------------------
+tic()
 cv.fit.demo = cv.glmnet(demo.combined.X, combined$y, family = "binomial", 
                    alpha = 0, 
                    standardize = FALSE, keep = TRUE)
-#cbind(cv.fit.demo$lambda, cv.fit.demo$cvm)
 param.demo = cv.fit.demo$lambda.min   #best parameter
 coef.demo = coef(cv.fit.demo, s = "lambda.min")
+toc()
 ```
 
 ```{r}
 #--------------------------------------------------------------------
 #   Ridge Regression
 #--------------------------------------------------------------------
-demo.fit <- glmnet(data.matrix(demo.trn.X), trn$y, family="binomial", alpha = 0,
+tic()
+demo.fit <- glmnet(demo.trn.X, trn$y, family = "binomial", alpha = 0,
                    lambda = param.demo)
-# ridge.pred.trn <- predict(demo.fit, trn$X, type="response")
-demo.pred.tst <- predict(demo.fit, data.matrix(demo.tst.X), type="response")
-# print(data.frame(pred=as.integer(ridge.pred.trn > 0.5), true=trn$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #train data
-kable(data.frame(pred=as.integer(demo.pred.tst > 0.5), true=tst$y) %>% count(true,pred) %>%    mutate(freq=n/sum(n)))      #test data
+demo.pred.tst <- predict(demo.fit, data.matrix(demo.tst.X), type = "response")
+kable(data.frame(pred = as.integer(demo.pred.tst > 0.5), true = tst$y) %>% count(true,pred) %>%
+        mutate(freq = n / sum(n)))      #test data
+toc()
 
-confusion.demo <- confusion.glmnet(demo.fit, newx = data.matrix(demo.tst.X), newy = tst$y)
+confusion.demo <- confusion.glmnet(demo.fit, newx = demo.tst.X, newy = tst$y)
 confusion.demo
+
+idmin.demo = match(cv.fit.demo$lambda.min, cv.fit.demo$lambda)
+roc.demo = roc.glmnet(cv.fit.demo$fit.preval, newy = combined$y)[[idmin.demo]]
+plot(roc.demo)
+
+```
+```{r}
+#save output
+save(cv.fit.demo, demo.fit, confusion.demo, roc.demo, file = "Ridge_ImgCS.RData")
+```
+
+==============================================================================
+Selecting More than one Slice
+==============================================================================
+```{r}
+S.five <- array (NA, dim = c(176, 1040, length(img_list)))
+
+for (i in 1 : length(img_list)){            #select slice 88 and create array 176x208x198
+  a = img_list[[i]]
+  test1 = a[, , 100]
+  test2 = a[, , 95]
+  test3 = a[, , 90]
+  test4 = a[, , 85]
+  test5 = a[, , 80]
+  S.five[, , i] = cbind(test1,test2,test3,test4,test5)
+}
+
+#--------------------------------------------------------------------
+#   Remove rows and columns with all 0
+#--------------------------------------------------------------------
+S.five =  S.five[apply(S.five != 0, 1, any),   #137x833x198
+               apply(S.five != 0, 2, any), ]
 
 ```
 
 
+```{r}
+#--------------------------------------------------------------------
+#   Separate Train and Test Data 8:2 (Five Slices)
+#--------------------------------------------------------------------
+train.X.2 = S.five[, , random_sample]
+test.X.2  = S.five[, , - random_sample]
+
+trn.2 = prep_binary_classification(train.X.2, train.Y, 1, 0)
+tst.2 = prep_binary_classification(test.X.2, test.Y, 1, 0)
+
+## Check the dimensions of the data
+print( dim(trn.2$X) )
+print( length(trn.2$y) )
+print( dim(tst.2$X) )
+print( length(tst.2$y) )
+
+combined.2 = prep_binary_classification (S.five, oasis_csdt$CDR, 1, 0)
+print( dim(combined.2$X) ) 
+print( length(combined.2$y) )
+```
+```{r}
+#--------------------------------------------------------------------
+#   Cross Validation Ridge (Five Slices)
+#--------------------------------------------------------------------
+tic()
+cv.fit.five = cv.glmnet(combined.2$X, combined.2$y, family = "binomial", 
+                   alpha = 0, 
+                   standardize = FALSE, keep = TRUE)
+param.five = cv.fit.five$lambda.min             #best lambda parameter
+coef.five  = coef(cv.fit.five, s = "lambda.min")
+toc()
 
 
 
+```
 
+```{r}
+#--------------------------------------------------------------------
+#   Ridge Regression (Five Slices)
+#--------------------------------------------------------------------
+tic()
+five.fit <- glmnet(trn.2$X, trn.2$y, family = "binomial", alpha = 0, lambda = param.five)
+five.pred.tst <- predict(five.fit, tst.2$X, type = "response")
+kable(data.frame(pred = as.integer(five.pred.tst > 0.5), true = tst.2$y) %>% count(true, pred) %>%
+        mutate(freq = n / sum(n)))      #test data
+toc()
 
-
+confusion.five <- confusion.glmnet(five.fit, newx = tst.2$X, newy = tst.2$y)
+confusion.five
+```
 
 
 
