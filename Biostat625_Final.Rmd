@@ -17,9 +17,11 @@ Since AD is more prevalent among older adults, we selected individuals with age 
 # Conclusion and Discussion
 
 # Deliverable and Code Repository
-Shiny App:   
-GitHub:   
-Google Colab?  
+### Shiny App
+Shiny Application We built our Shiny application using the CNN model(?) as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by running this command, shiny::runGitHub('625OASIS','y1zhong', subdir = 'shiny'), on the R console. Packages like Shiny and oro.nifti must be installed before this app can be run.
+
+### GitHub:   
+### Google Colab?  
 
 # Contributions
 
