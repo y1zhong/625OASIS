@@ -18,7 +18,7 @@ for (i in 1:length(img_list)){
 #--------------------------------------------------------------------
 #   Remove rows and columns with all 0
 #--------------------------------------------------------------------
-S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
+S.new2 =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
 
 data = read.csv("./data/oasis_cross-sectional_filter.csv")
 labels = data$CDR
