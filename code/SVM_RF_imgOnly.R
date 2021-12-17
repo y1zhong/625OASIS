@@ -160,6 +160,8 @@ CDR_acc = data.frame(
 )
 knitr::kable(CDR_acc)
 
-SVM_RF_ImgOnly_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,CDR_acc=CDR_acc)
+pred_and_true = list(True_cdr=True_cdr,lda.pred = as.numeric(lda.pred)-1, svm.lin.pred = as.numeric(svm.lin.pred)-1,svm.rad.pred = as.numeric(svm.rad.pred)-1,rf.pred=as.numeric(rf.pred)-1)
+
+SVM_RF_ImgOnly_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,CDR_acc=CDR_acc,pred_and_true= pred_and_true)
 
 save(SVM_RF_ImgOnly_result, file ="./result/SVM_RF_ImgOnly_result.Rdata")
