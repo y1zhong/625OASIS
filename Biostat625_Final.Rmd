@@ -53,7 +53,11 @@ Parameter tuning was performed through 10-fold cross-validation analysis via ``t
 # Deliverable and Code Repository
 ### Shiny App
 Shiny Application We built our Shiny application using the CNN model(?) as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by running this command, shiny::runGitHub('625OASIS','y1zhong', subdir = 'shiny'), on the R console. Packages like Shiny and oro.nifti must be installed before this app can be run.
+ 
+### GitHub
+A GitHub repository is created to store, update, display, and share the results of our project. Here is the link: https://github.com/y1zhong/625OASIS
 
+# Google Colab?  
 
 # Evaluation
 
@@ -67,8 +71,7 @@ knitr::kable(result_table, align="c", col.names = NULL)
       # caption = "Table 2 Performance of models in sensitivity, specificity, and accuracy")
 ```
 
-# GitHub:   
-# Google Colab?  
+
 
 # Discussion
 
