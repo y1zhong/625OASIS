@@ -23,17 +23,31 @@ knitr::include_graphics(c("./tables and figures/MRI.png"))
 
 In order to classify dementia from CN, we applied the following four methods: penalized logistic regression (ridge and lasso), random forest, support vector machine (linear and radial kernel), and convolutional neural network (CNN).  
 
+**Data Preperation**
+In order to prepare data for all 3D methods, we selected the middle slice for each patient, creating an array of dimensions 176x208x176. Next, to improve the speed of model analysis, data was further cleaned by removing axes containing all zero values.
+
 **a) Logistic Regression**  
 Logistic regression (LR) was perferred over linear discriminant analysis (LDA) because it does not require the independent variables to satisfy the assumptions of linearity, normal distribution, or equal variance. LR also provides a deterministic model yielding weighting factors for each contributing variable, while avoiding overfitting the data.  
 
 In order to prepare data for logistic regression, we selected the middle slice for each patient, creating an array of dimensions 176x208x176. Next, to improve the speed of model analysis, data was further cleaned by removing axes containing all zero values. Parameter tuning was performed through 10-fold cross-validation analysis via ``cv.glmnet``. Both ridge and lasso methods were used for regularization. On that basis, we further incorporated demographic variables with neuroimaging data and fit ridge logistic regression.      
 
 **b) Random Forest**   
+Random forests is an ensemble learning method. For classification tasks, its output is the class selected by most trees. It doesnt overfit with more features and its efficiency is particularly notable in large data sets.
+
+Parameter tuning was performed through 10-fold cross-validation analysis via ``trainControl`` which performs control on train data from ``caret`` package. The random forests was called from ``randomForest``. On that basis, we further incorporated demographic variables with neuroimaging data and fit the model again. 
 
 **c) SVM**   
+Support vector machine (SVM) is a supervised learning method. It is effective in high dimensional spaces and in cases where number of dimensions is greater than the number of samples. It is also memory efficient since it uses a subset of training points in the decision function, known as support vectors. 
+
+Parameter tuning was performed through 10-fold cross-validation analysis via ``trainControl`` which performs control on train data from ``caret`` package. Both linear and radial kernel were used for regularization. The SVM with linear kernel was called from  ``e1071``and the SVM with radial kernel was called from ``kernlab``. On that basis, we further incorporated demographic variables with neuroimaging data and fit both models again. 
+
+**d) Naive Bayes**  
+Naive Bayes is a  classifier based on applying Bayes' theorem with strong independence assumptions between the features. It coupled simple Bayesian network models with kernel density estimation, and can achieve higher accuracy levels.Unlike ther types of classifiers wihch use expensive iterative approximation, its maximum-likelihood training can be done by evaluating a closed-form expression, which only takes linear time.
+
+Parameter tuning was performed through 10-fold cross-validation analysis via ``trainControl`` which performs control on train data from ``caret`` package.  The Naive Bayes was called from ``klaR``. On that basis, we further incorporated demographic variables with neuroimaging data and fit model again. 
 
 
-**b) CNN**   
+**e) CNN**   
 
 
 # Deliverable and Code Repository

@@ -57,22 +57,22 @@ prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0
 trn = prep_binary_classification(train.X, train.Y, 1, 0)
 tst = prep_binary_classification(test.X, test.Y, 1, 0)
 
-new_trnX = cbind(train.demo[,c(1:4)], trn$X)
-new_tstX = cbind(test.demo[,c(1:4)], tst$X)
-pca.X =prcomp(new_trnX)
-trn_X <- predict(pca.X, newdata = new_trnX)
-tst_X <- predict(pca.X, newdata =new_tstX)
-
-Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X)
-Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X)
-
-
-# pca.X =prcomp(trn$X)
-# trn_X <- predict(pca.X, newdata = trn$X)
-# tst_X <- predict(pca.X, newdata =tst$X)
+# new_trnX = cbind(train.demo[,c(1:4)], trn$X)
+# new_tstX = cbind(test.demo[,c(1:4)], tst$X)
+# pca.X =prcomp(new_trnX)
+# trn_X <- predict(pca.X, newdata = new_trnX)
+# tst_X <- predict(pca.X, newdata =new_tstX)
 # 
-# Training_data <- cbind.data.frame(y=train.demo$CDR,train.demo[,c(1:4)],trn_X)
-# Testing_data <- cbind.data.frame(y=test.demo$CDR,test.demo[,c(1:4)],tst_X)
+# Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X)
+# Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X)
+
+
+pca.X =prcomp(trn$X)
+trn_X <- predict(pca.X, newdata = trn$X)
+tst_X <- predict(pca.X, newdata =tst$X)
+
+Training_data <- cbind.data.frame(y=train.demo$CDR,train.demo[,c(1:4)],trn_X)
+Testing_data <- cbind.data.frame(y=test.demo$CDR,test.demo[,c(1:4)],tst_X)
 True_cdr = as.numeric(Testing_data$y)-1
 
 calc_acc = function(actual, predicted) {
@@ -127,18 +127,6 @@ svm.rad.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.rad.pred)
 svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat,svm.rad.FPFNSeSp=svm.rad.FPFNSeSp)
 svm.rad.res
 
-# ## SVM with Polynomial Kernel
-# set.seed(123)
-# svm.ply.fit <-train(y~., data = Training_data, method="svmPoly",trControl=ctrl,tuneLength=10)
-# #svm.ply.Yhat = svm.ply.fit$pred[svm.ply.fit$results$C == 0.5,]$pred
-# svm.ply.TrainAcc = max(svm.ply.fit$results["Accuracy"])
-# svm.ply.pred=predict(svm.ply.fit,Testing_data)
-# svm.ply.TestAcc = calc_acc(predicted = svm.ply.pred, actual = Testing_data$y)
-# 
-# svm.ply.res = list(svm.ply.fit=svm.ply.fit,svm.ply.TrainAcc=svm.ply.TrainAcc,svm.ply.TestAcc=svm.ply.TestAcc)
-# svm.ply.res
-
-
 ## Ramdom Forest
 set.seed(123)
 rf.fit <-train(y~., data = Training_data, method="rf",trControl=ctrl,tuneLength=10)
@@ -151,28 +139,27 @@ rf.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = rf.pred)
 rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat,rf.FPFNSeSp=rf.FPFNSeSp)
 rf.res
 
-# ## Naive Bayes
-# set.seed(123)
-# nb.fit <-train(y~., data = Training_data, method="nb",trControl=ctrl,tuneLength=10)
-# 
-# nb.TrainAcc = max(nb.fit$results["Accuracy"])
-# nb.pred=predict(nb.fit,Testing_data)
-# nb.TestAcc = calc_acc(predicted = nb.pred, actual = Testing_data$y)
-# 
-# nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc)
-# nb.res
+## Naive Bayes
+set.seed(123)
+nb.fit <-train(y~., data = Training_data, method="nb",trControl=ctrl,tuneLength=10)
 
-# result = list(svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res)
+nb.TrainAcc = max(nb.fit$results["Accuracy"])
+nb.pred=predict(nb.fit,Testing_data)
+nb.TestAcc = calc_acc(predicted = nb.pred, actual = Testing_data$y)
+nb.cfmat = table(Prediction = nb.pred, Reference = True_cdr)
+nb.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = nb.pred)
+nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc,nb.cfmat=nb.cfmat,nb.FPFNSeSp=nb.FPFNSeSp)
+nb.res
 
 CDR_acc = data.frame(
-  Model = c("LDA", "SVM linear",  "SVM radial","Random Forest"),
-  TrainAccuracy = c(lda.TrainAcc, svm.lin.TrainAcc, svm.rad.TrainAcc, rf.TrainAcc),
-  TestAccuracy = c(lda.TestAcc, svm.lin.TestAcc, svm.rad.TestAcc, rf.TestAcc)
+  Model = c("LDA", "SVM linear",  "SVM radial","Random Forest","Naive Bayes"),
+  TrainAccuracy = c(lda.TrainAcc, svm.lin.TrainAcc, svm.rad.TrainAcc, rf.TrainAcc,nb.TrainAcc),
+  TestAccuracy = c(lda.TestAcc, svm.lin.TestAcc, svm.rad.TestAcc, rf.TestAcc, nb.TestAcc)
 )
 knitr::kable(CDR_acc)
 
-pred_and_true = list(True_cdr=True_cdr,lda.pred = as.numeric(lda.pred)-1, svm.lin.pred = as.numeric(svm.lin.pred)-1,svm.rad.pred = as.numeric(svm.rad.pred)-1,rf.pred=as.numeric(rf.pred)-1)
+pred_and_true = list(True_cdr=True_cdr,lda.pred = as.numeric(lda.pred)-1, svm.lin.pred = as.numeric(svm.lin.pred)-1,svm.rad.pred = as.numeric(svm.rad.pred)-1,rf.pred=as.numeric(rf.pred)-1,nb.pred=as.numeric(nb.pred)-1)
 
-SVM_RF_ImgCS_result2 = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,CDR_acc=CDR_acc,pred_and_true= pred_and_true)
+SVM_RF_ImgCS_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,nb.res = nb.res,CDR_acc=CDR_acc,pred_and_true= pred_and_true)
 
-save(SVM_RF_ImgCS_result2, file ="./result/SVM_RF_ImgCS_result2.Rdata")
+save(SVM_RF_ImgCS_result, file ="./result/SVM_RF_ImgCS_result.Rdata")

@@ -85,6 +85,14 @@ set.seed(123)
 lda.fit <-train(x = Training_data[,-1], y = Training_data$y, data = Training_data, method="sparseLDA",trControl=ctrl,tuneLength=10)
 #lda.Yhat = lda.fit$pred$pred
 lda.pred = predict(lda.fit, Testing_data)
+
+# library(ROCR)
+# lda.roc = prediction(as.numeric(lda.pred), as.numeric(Testing_data$y)-1)
+# perf.lda <- performance(lda.roc, "fpr", "tpr")
+# tpr.lda <- perf.lda@x.values[[1]]
+# fpr.lda <- perf.lda@y.values[[1]]
+
+
 lda.TrainAcc = max(na.omit(lda.fit$results$Accuracy))
 lda.TestAcc = calc_acc(predicted = lda.pred, actual = Testing_data$y)
 lda.cfmat = table(Prediction = lda.pred, Reference = True_cdr)
@@ -116,18 +124,6 @@ svm.rad.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.rad.pred)
 svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat,svm.rad.FPFNSeSp=svm.rad.FPFNSeSp)
 svm.rad.res
 
-# ## SVM with Polynomial Kernel
-# set.seed(123)
-# svm.ply.fit <-train(y~., data = Training_data, method="svmPoly",trControl=ctrl,tuneLength=10)
-# #svm.ply.Yhat = svm.ply.fit$pred[svm.ply.fit$results$C == 0.5,]$pred
-# svm.ply.TrainAcc = max(svm.ply.fit$results["Accuracy"])
-# svm.ply.pred=predict(svm.ply.fit,Testing_data)
-# svm.ply.TestAcc = calc_acc(predicted = svm.ply.pred, actual = Testing_data$y)
-# 
-# svm.ply.res = list(svm.ply.fit=svm.ply.fit,svm.ply.TrainAcc=svm.ply.TrainAcc,svm.ply.TestAcc=svm.ply.TestAcc)
-# svm.ply.res
-
-
 ## Ramdom Forest
 set.seed(123)
 rf.fit <-train(y~., data = Training_data, method="rf",trControl=ctrl,tuneLength=10)
@@ -140,28 +136,27 @@ rf.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = rf.pred)
 rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat,rf.FPFNSeSp=rf.FPFNSeSp)
 rf.res
 
-# ## Naive Bayes
-# set.seed(123)
-# nb.fit <-train(y~., data = Training_data, method="nb",trControl=ctrl,tuneLength=10)
-# 
-# nb.TrainAcc = max(nb.fit$results["Accuracy"])
-# nb.pred=predict(nb.fit,Testing_data)
-# nb.TestAcc = calc_acc(predicted = nb.pred, actual = Testing_data$y)
-# 
-# nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc)
-# nb.res
+## Naive Bayes
+set.seed(123)
+nb.fit <-train(y~., data = Training_data, method="nb",trControl=ctrl,tuneLength=10)
 
-# result = list(svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res)
+nb.TrainAcc = max(nb.fit$results["Accuracy"])
+nb.pred=predict(nb.fit,Testing_data)
+nb.TestAcc = calc_acc(predicted = nb.pred, actual = Testing_data$y)
+nb.cfmat = table(Prediction = nb.pred, Reference = True_cdr)
+nb.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = nb.pred)
+nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc,nb.cfmat=nb.cfmat,nb.FPFNSeSp=nb.FPFNSeSp)
+nb.res
 
 CDR_acc = data.frame(
-  Model = c("LDA", "SVM linear",  "SVM radial","Random Forest"),
-  TrainAccuracy = c(lda.TrainAcc, svm.lin.TrainAcc, svm.rad.TrainAcc, rf.TrainAcc),
-  TestAccuracy = c(lda.TestAcc, svm.lin.TestAcc, svm.rad.TestAcc, rf.TestAcc)
+  Model = c("LDA", "SVM linear",  "SVM radial","Random Forest","Naive Bayes"),
+  TrainAccuracy = c(lda.TrainAcc, svm.lin.TrainAcc, svm.rad.TrainAcc, rf.TrainAcc,nb.TrainAcc),
+  TestAccuracy = c(lda.TestAcc, svm.lin.TestAcc, svm.rad.TestAcc, rf.TestAcc, nb.TestAcc)
 )
 knitr::kable(CDR_acc)
 
-pred_and_true = list(True_cdr=True_cdr,lda.pred = as.numeric(lda.pred)-1, svm.lin.pred = as.numeric(svm.lin.pred)-1,svm.rad.pred = as.numeric(svm.rad.pred)-1,rf.pred=as.numeric(rf.pred)-1)
+pred_and_true = list(True_cdr=True_cdr,lda.pred = as.numeric(lda.pred)-1, svm.lin.pred = as.numeric(svm.lin.pred)-1,svm.rad.pred = as.numeric(svm.rad.pred)-1,rf.pred=as.numeric(rf.pred)-1,nb.pred=as.numeric(nb.pred)-1)
 
-SVM_RF_ImgOnly_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,CDR_acc=CDR_acc,pred_and_true= pred_and_true)
+SVM_RF_ImgOnly_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,svm.rad.res = svm.rad.res,rf.res=rf.res,nb.res = nb.res,CDR_acc=CDR_acc,pred_and_true= pred_and_true)
 
 save(SVM_RF_ImgOnly_result, file ="./result/SVM_RF_ImgOnly_result.Rdata")
