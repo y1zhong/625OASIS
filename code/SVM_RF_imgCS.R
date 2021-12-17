@@ -40,6 +40,7 @@ test.X = S.new[,,-random_sample]
 
 oasis_csdt$CDR = as.factor(oasis_csdt$CDR)
 levels(oasis_csdt$CDR) <- c("EqaulTo0", "LargeThan0")
+oasis_csdt$M.F = ifelse(oasis_csdt$M.F == "F", 1, 0)
 
 train.demo = oasis_csdt[random_sample,]
 test.demo = oasis_csdt[-random_sample,]
@@ -56,12 +57,22 @@ prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0
 trn = prep_binary_classification(train.X, train.Y, 1, 0)
 tst = prep_binary_classification(test.X, test.Y, 1, 0)
 
+# new_trnX = cbind(train.demo[,c(1:4)], trn$X)
+# new_tstX = cbind(test.demo[,c(1:4)], tst$X)
+# pca.X =prcomp(new_trnX)
+# trn_X <- predict(pca.X, newdata = new_trnX)
+# tst_X <- predict(pca.X, newdata =new_tstX)
+# 
+# Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X)
+# Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X)
+
+
 pca.X =prcomp(trn$X)
 trn_X <- predict(pca.X, newdata = trn$X)
 tst_X <- predict(pca.X, newdata =tst$X)
 
-Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X, train.demo[,c(1:4)])
-Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X,test.demo[,c(1:4)])
+Training_data <- cbind.data.frame(y=train.demo$CDR,train.demo[,c(1:4)],trn_X)
+Testing_data <- cbind.data.frame(y=test.demo$CDR,test.demo[,c(1:4)],tst_X)
 True_cdr = as.numeric(Testing_data$y)-1
 
 calc_acc = function(actual, predicted) {
