@@ -41,7 +41,7 @@ In order to prepare data for logistic regression, we selected the middle slice f
 Shiny Application We built our Shiny application using the CNN model(?) as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by running this command, shiny::runGitHub('625OASIS','y1zhong', subdir = 'shiny'), on the R console. Packages like Shiny and oro.nifti must be installed before this app can be run.
 
 
-# Evaluation (to do: need to improve table format)
+# Evaluation
 
 To evaluate the performance of each model, we compared th test sensitivity, specificity, and accuracy across models (Table 2). Overall, the Ridge logistic regression performed the best predication with the highest accuracy(0.79), sensitivity(0.75), and specificity(0.83), followed by Lasso regression with a relative high accuracy (0.68). However, RF and LDA had a higher sensitivity than Lasso regression (0.65 and 0.63 respectively). Additionally, Figure 2 presented the ROC curve for each model along with the AUC value which also indicated that Ridge regression was the best model to predict Alzheimer dementia. We further adjusted demographic information in our model and compared the result with image data only. For logistic penalized regression, since the Ridge method performed better than the Lasso, we only adjusted for demographic in Ridge regression. However, further adjusting demographic did not improve the prediction result of Ridge regression, LDA, and SVM. However, the specificity of Random Forest method increased 23%, while sensitivity dropped to 28%. performance
 
