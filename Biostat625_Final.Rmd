@@ -14,6 +14,102 @@ Since AD is more prevalent among older adults, we selected individuals with age 
 
 # Methods and Results
 
+# Evaluation
+```{r, echo=FALSE}
+library(ggplot2)
+library(glmnet)
+library(data.table)
+library(sparseLDA)
+
+#--------------------------------------------------------------------
+#   Select slice 88, create 3d array (176, 208, 198) Partition Train and Test Data 8:2
+#--------------------------------------------------------------------
+load("./data/img_list.rds")
+a = img_list[[1]]                           #read in 3D array 176x208x176
+S.new <- array (NA, dim = c(176, 208, length(img_list)))
+
+for (i in 1 : length(img_list)){            #select slice 88 and create array 176x208x198
+  a = img_list[[i]]
+  test = a[, , 88]
+  S.new[, , i] = test
+}
+
+#   Remove rows and columns with all 0
+S.new =  S.new[apply(S.new != 0, 1, any),   #137x169x198
+               apply(S.new != 0, 2, any), ]
+load("./data/oasis_csdt.Rdata")
+labels = oasis_csdt$CDR
+
+#   Partition Train and Test Data 8:2
+n = dim(S.new)[3]   #from n = 198
+num_lst = 1:n
+set.seed(123)
+random_sample <- createDataPartition(num_lst, p = 0.8, list = FALSE)
+
+train.X = S.new[, , random_sample]
+test.X  = S.new[, , - random_sample]
+
+train.demo = oasis_csdt[random_sample, ]
+test.demo  = oasis_csdt[ - random_sample, ]
+
+train.Y = train.demo$CDR
+test.Y  = test.demo$CDR
+
+prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
+  dims = dim(images)
+  X.pos = t( matrix(images[, , labels %in% posLabel], nrow=dims[1] * dims[2]) ) ## n1 x (137x169)
+  X.neg = t( matrix(images[, , labels %in% negLabel], nrow=dims[1] * dims[2]) ) ## n1 x (137x169)
+  return( list(X=rbind(X.pos, X.neg),
+              y = c(rep(1,nrow(X.pos)), rep(0,nrow(X.neg)))))
+}
+
+trn = prep_binary_classification(train.X, train.Y, 1, 0)
+tst = prep_binary_classification(test.X, test.Y, 1, 0)
+
+#prepare whole data for cross-validation
+combined = prep_binary_classification (S.new, oasis_csdt$CDR, 1, 0)
+
+# load all model results
+results<-Sys.glob(file.path("./result","*ata"))
+for(i in 1:length(results)) load(results[[i]]) 
+
+models<-list(lasso.fit, ridge.fit)
+models.name<-c("Lasso", "Ridge")
+## confusion
+par(mfrow=c(2,2))
+for (i in 1:length(models)) {
+  confusion<- data.table(confusion.glmnet(models[[i]], newx = tst$X, newy = tst$y))
+  accuracy<-round(confusion[Predicted==True][, sum(N)]/(confusion[,sum(N)]), digits = 2)
+  plotTable<-confusion[,prop:=round(N/sum(N), digits = 2), by=True][,goodbad:=ifelse(Predicted==True,"Good", "Bad" )]
+  print(ggplot(data = plotTable, mapping = aes(x = True, y = Predicted, fill = goodbad, alpha = prop)) +
+  geom_tile() +
+  geom_text(aes(label = prop), vjust = .5, fontface  = "bold", alpha = 1) +
+  scale_fill_manual(values = c(Good = "steelblue", Bad = "red")) +
+  labs(title = paste0(models.name[i],": Accuracy ",accuracy), x = "True dementia", y="Predictive dementia")+
+  theme_bw()+
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")))
+}
+
+roc_svm_tes
+
+
+#### combine ROC data
+roc.results<-list(roc.lasso, roc.ridge, roc.demo)
+roc.names<-c("Lasso: Image only","Ridge:Image only","Ridge: Image+Demographic")
+ROC<-data.frame()
+for (i in 1:length(roc.results)){
+  temp<-cbind(Model=rep(roc.names[i],nrow(roc.results[[i]])), roc.results[[i]])
+  ROC<-rbind(ROC,temp)
+}
+
+ggplot(data=ROC, aes(x=FPR,y=TPR), group = Model, color=Model)+
+  geom_step(aes(group=Model, color=Model))+
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), panel.background = element_blank())
+
+```
+
 # Conclusion and Discussion
 
 # Deliverable and Code Repository
