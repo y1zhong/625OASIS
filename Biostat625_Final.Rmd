@@ -15,11 +15,12 @@ Since AD is more prevalent among older adults, we selected individuals between 6
 #insert Table 1
 ```
 
+# Methods and Results
 ```{r,echo=FALSE,out.height = '200px', fig.cap="MRI scan of CN (left) and dementia (right) patients", fig.align='center'}
 knitr::include_graphics(c("./tables and figures/MRI.png"))     
 ```
 
-<<<<<<< HEAD
+
 # Evaluation
 ```{r, echo=FALSE}
 library(ggplot2)
@@ -117,7 +118,6 @@ ggplot(data=ROC, aes(x=FPR,y=TPR), group = Model, color=Model)+
 ```
 
 # Conclusion and Discussion
-=======
 # Methods and Results  
 In order to classify dementia from CN, we applied the following four methods: penalized logistic regression (ridge and lasso), random forest, support vector machine (linear and radial kernel), and convolutional neural network (CNN).  
 
@@ -133,10 +133,6 @@ In order to prepare data for logistic regression, we selected the middle slice f
 
 **b) CNN**   
 
-
-
-# Conclusion and Discussion  
->>>>>>> 5f4a4e0e6afa6dec5a7d1b801825444d10020363
 
 # Deliverable and Code Repository
 ### Shiny App
