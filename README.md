@@ -16,5 +16,7 @@ Preliminary results are listed below:
 | Specificity  | 0.78 | 0.78 | 0.51 | 0.47 | 0.51 | ??? |
 | Accuracy  | 0.68 | 0.68 | 0.57 | 0.48 | 0.58 | ??? |
 
-Contributor: Boya Jiang, Chen Chen, Tiankai Xie, Yuan Zhong.
+
+## Contributor:
+Coathor: Boya Jiang, Chen Chen, Tiankai Xie, Yuan Zhong.
 
