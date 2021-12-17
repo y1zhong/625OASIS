@@ -7,6 +7,7 @@ library(MASS)
 library(e1071)
 library(caret)
 library(dplyr)
+library(mice)
 
 S.new <- array (NA, dim = c(176,208,length(img_list)))
 
@@ -18,10 +19,16 @@ for (i in 1:length(img_list)){
 #--------------------------------------------------------------------
 #   Remove rows and columns with all 0
 #--------------------------------------------------------------------
-S.new2 =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
+S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
 
 data = read.csv("./data/oasis_cross-sectional_filter.csv")
-labels = data$CDR
+oasis_f = data[,c(1,2,4:10)]
+set.seed(123)
+pos = sample(1:5,1)
+mi.oasis_f = mice(oasis_f, m=5, printFlag =FALSE)
+mi.temp.oasis_f = complete(mi.oasis_f,"all")
+oasis_csdt = mi.temp.oasis_f[[pos]][,c(2:5,7)]
+labels = oasis_csdt$CDR
 
 n = nrow(S.new)
 num_lst = 1:n
@@ -31,11 +38,11 @@ random_sample <- createDataPartition(num_lst, p = 0.8, list = FALSE)
 train.X = S.new[,,random_sample]
 test.X = S.new[,,-random_sample]
 
-data$CDR = as.factor(data$CDR)
-levels(data$CDR) <- c("EqaulTo0", "LargeThan0")
+oasis_csdt$CDR = as.factor(oasis_csdt$CDR)
+levels(oasis_csdt$CDR) <- c("EqaulTo0", "LargeThan0")
 
-train.demo = data[random_sample,]
-test.demo = data[-random_sample,]
+train.demo = oasis_csdt[random_sample,]
+test.demo = oasis_csdt[-random_sample,]
 train.Y = as.numeric(train.demo$CDR)-1
 test.Y = as.numeric(test.demo$CDR)-1
 
@@ -53,12 +60,21 @@ pca.X =prcomp(trn$X)
 trn_X <- predict(pca.X, newdata = trn$X)
 tst_X <- predict(pca.X, newdata =tst$X)
 
-Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X)
-Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X)
+Training_data <- cbind.data.frame(y=train.demo$CDR,trn_X, train.demo[,c(1:4)])
+Testing_data <- cbind.data.frame(y=test.demo$CDR,tst_X,test.demo[,c(1:4)])
 True_cdr = as.numeric(Testing_data$y)-1
 
 calc_acc = function(actual, predicted) {
   mean(actual == predicted)
+}
+
+# Sensitivity Analysis
+FPFNSeSp <- function(TrueBeta=TrueBeta, Beta=Beta){
+  FPR = length(which(TrueBeta==0 & Beta!=0))/length(TrueBeta)
+  FNR= length(which(TrueBeta!=0 & Beta==0))/length(TrueBeta)
+  Se = length(which(TrueBeta!=0 & Beta!=0))/length(which(TrueBeta!=0))
+  Sp = length(which(TrueBeta==0 & Beta==0))/length(which(TrueBeta==0))
+  return(c(FPR,FNR,Se,Sp))
 }
 
 ctrl <- trainControl(method = "cv", number=10, savePredictions=TRUE, classProbs=TRUE, allowParallel = T,verboseIter = T) 
@@ -72,7 +88,8 @@ lda.pred = predict(lda.fit, Testing_data)
 lda.TrainAcc = max(na.omit(lda.fit$results$Accuracy))
 lda.TestAcc = calc_acc(predicted = lda.pred, actual = Testing_data$y)
 lda.cfmat = table(Prediction = lda.pred, Reference = True_cdr)
-lda.res = list(lda.fit=lda.fit,lda.TrainAcc=lda.TrainAcc,lda.TestAcc=lda.TestAcc,lda.cfmat=lda.cfmat)
+lda.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = lda.pred)
+lda.res = list(lda.fit=lda.fit,lda.TrainAcc=lda.TrainAcc,lda.TestAcc=lda.TestAcc,lda.cfmat=lda.cfmat,lda.FPFNSeSp=lda.FPFNSeSp)
 lda.res
 
 ## SVM with Linear Kernel
@@ -83,7 +100,8 @@ svm.lin.TrainAcc = max(svm.lin.fit$results["Accuracy"])
 svm.lin.pred=predict(svm.lin.fit,Testing_data)
 svm.lin.TestAcc = calc_acc(predicted = svm.lin.pred, actual = Testing_data$y)
 svm.lin.cfmat = table(Prediction = svm.lin.pred, Reference = True_cdr)
-svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc,svm.lin.cfmat= svm.lin.cfmat)
+svm.lin.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.lin.pred)
+svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc,svm.lin.cfmat= svm.lin.cfmat,svm.lin.FPFNSeSp=svm.lin.FPFNSeSp)
 svm.lin.res 
 
 ## SVM with Radial Kernel
@@ -94,7 +112,8 @@ svm.rad.TrainAcc = max(svm.rad.fit$results["Accuracy"])
 svm.rad.pred=predict(svm.rad.fit,Testing_data)
 svm.rad.TestAcc = calc_acc(predicted = svm.rad.pred, actual = Testing_data$y)
 svm.rad.cfmat = table(Prediction = svm.rad.pred, Reference = True_cdr)
-svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat)
+svm.rad.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.rad.pred)
+svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat,svm.rad.FPFNSeSp=svm.rad.FPFNSeSp)
 svm.rad.res
 
 # ## SVM with Polynomial Kernel
@@ -117,7 +136,8 @@ rf.TrainAcc = max(rf.fit$results["Accuracy"])
 rf.pred=predict(rf.fit,Testing_data)
 rf.TestAcc = calc_acc(predicted = rf.pred, actual = Testing_data$y)
 rf.cfmat = table(Prediction = rf.pred, Reference = True_cdr)
-rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat)
+rf.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = rf.pred)
+rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat,rf.FPFNSeSp=rf.FPFNSeSp)
 rf.res
 
 # ## Naive Bayes
