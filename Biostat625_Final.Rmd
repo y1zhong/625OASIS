@@ -20,14 +20,6 @@ Since AD is more prevalent among older adults, we selected individuals between 6
 knitr::include_graphics(c("./tables and figures/MRI.png"))     
 ```
 
-
-# Evaluation
-```{r, echo=FALSE}
-
-```
-
-# Conclusion and Discussion
-# Methods and Results  
 In order to classify dementia from CN, we applied the following four methods: penalized logistic regression (ridge and lasso), random forest, support vector machine (linear and radial kernel), and convolutional neural network (CNN).  
 
 **a) Logistic Regression**  
@@ -47,9 +39,23 @@ In order to prepare data for logistic regression, we selected the middle slice f
 ### Shiny App
 Shiny Application We built our Shiny application using the CNN model(?) as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by running this command, shiny::runGitHub('625OASIS','y1zhong', subdir = 'shiny'), on the R console. Packages like Shiny and oro.nifti must be installed before this app can be run.
 
-### GitHub:   
-### Google Colab?  
 
+# Evaluation (to do: need to improve table format)
+
+To evaluate the performance of each model, we compared th test sensitivity, specificity, and accuracy across models (Table 2). Overall, the Ridge logistic regression performed the best predication with the highest accuracy(0.79), sensitivity(0.75), and specificity(0.83), followed by Lasso regression with a relative high accuracy (0.68). However, RF and LDA had a higher sensitivity than Lasso regression (0.65 and 0.63 respectively). Additionally, Figure 2 presented the ROC curve for each model along with the AUC value which also indicated that Ridge regression was the best model to predict Alzheimer dementia. We further adjusted demographic information in our model and compared the result with image data only. For logistic penalized regression, since the Ridge method performed better than the Lasso, we only adjusted for demographic in Ridge regression. However, further adjusting demographic did not improve the prediction result of Ridge regression, LDA, and SVM. However, the specificity of Random Forest method increased 23%, while sensitivity dropped to 28%. 
+
+```{r, echo=FALSE}
+library(knitr)
+load("./tables and figures/result_table.RData")
+kable(result_table[-1,],col.names = NA)
+```
+
+# GitHub:   
+# Google Colab?  
+
+# Discussion
+
+In conclusion, we compared the prediction of multiple classification models and the Ridge regression performed the best in terms of accuracy, sensitivity, and specificity. Comparing to literature, our analyses had several important strengths. Some literature may have outstanding accuracy that is more than 95% when compared Alzheimer's dementia MRI with health control MRI from young population. However, young population were not at risk of developing AD and using their MRI as control will introduce bias and over predicting the result. Our analysis only included elder adults so our model classification would be more practice to distinguish AD and healthy aging brain in reality. Secondly, our outcome AD was balanced among cases and controls which would increase our accuracy. However, accuracy of AD prediction was different by the different stage of AD. AD was hard to diagnosis at early statement (MCI) as usually there was no significant symptoms, but the degeneration of the brain had began. AD was more likely to be diagnosis or discovered at more severe stage, in our case, which was when CDR equaled one or two. Therefore, accuracy would be differentiated by the level of comparison and differentiating MCI from healthy aging was the most difficult and past classification models showed much lower accuracy between 40% to 60%. In our analysis, we combined MCI, AD and severe AD as one cased group which made prediction harder with lower accuracy. Our cNN method was the most challenging model as it not only required large sample size, but also advanced computing environment as cluster computing or GPU computing to incorporate the high-dimension structure. Many research teams already recruited extraordinary engineers and computer science expertise to improve the algorithm, but with less focus important biomarkers of AD such as APOE and CSF and other important clinical information. Future research should consider including more biostatistics, neurology, and epidemiology field to create a multi-descipinary research. 
 # Contributions
 
 # References
