@@ -13,7 +13,6 @@ oasis %>%
   unique()
 #18 ID
 
-
 oasis_f = oasis[,c(1,2,4:10)]
 set.seed(123)
 pos = sample(1:5,1)
