@@ -12,7 +12,8 @@ OASIS (Open Access Series of Imaging Studies) is a well-known initiative that is
 
 Since AD is more prevalent among older adults, we selected individuals between 60 and 96 years old. The CDR was dichotomized to 0 for cognitive normal (CN), and 1 for any level of dementia. Our final samples composed of 198 individuals, which were randomly split into two groups in 80:20 ratios as training and testing sets, respectively. The training and testing sets had balanced CDR distribution. Table 1 shows a summary of demographic variables collected for CN and dementia groups. **[Description of SES missing data handling]**. Figure 1 shows a comparison of MRI scan between a CN patient and a dementia patient at the same slice.  
 ```{r, echo = F}
-#insert Table 1
+load('./tables and figures/summary_afterImp')
+sum_tb_after_imp
 ```
 
 # Methods and Results
