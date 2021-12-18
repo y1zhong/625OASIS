@@ -4,12 +4,12 @@ library(keras)
 library(tensorflow)
 load("../code/data/img_list_4d.rds")
 mat <- matrix(unlist(img_list))
-train_x <- runif(10*100*100*100*1, 0, 1)
-train_x <- array_reshape(unlist(img_list), dim = c(196, 178, 208, 178, 1))
+train_x <- runif(10 * 100 * 100 * 100 * 1, 0, 1)
+train_x <- array_reshape( unlist(img_list), dim = c(196, 178, 208, 178, 1) )
 
 # Outcome data, binary
-train_y <- to_categorical(sample(c(0,1), size = 10, replace = TRUE))
-model <- keras_model_sequential()
+train_y <- to_categorical( sample(c(0,1), size = 10, replace = TRUE) )
+model   <- keras_model_sequential()
 
 model %>% 
   layer_conv_3d(filters = 10,

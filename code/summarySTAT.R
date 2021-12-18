@@ -18,7 +18,7 @@ set.seed(123)
 pos = sample(1:5,1)
 mi.oasis_f = mice(oasis_f, m=5, printFlag =FALSE)
 mi.temp.oasis_f = complete(mi.oasis_f,"all")
-new_oasis = mi.temp.oasis_f[[pos]][,c(2:5,7)]
+new_oasis = mi.temp.oasis_f[[pos]][, c(2:5,7)]
 labels = new_oasis$CDR
 
 sum_tb_after_imp = tbl_summary(new_oasis, by = 'CDR')%>% add_overall()

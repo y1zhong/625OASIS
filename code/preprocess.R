@@ -22,10 +22,10 @@ img_list = lapply(file_filter, function(x){
   readANALYZE(x)@.Data
 })
 
-names(img_list) = sapply(file_filter, function(x)str_sub(x,1,13))
+names(img_list) = sapply( file_filter, function(x) str_sub(x,1,13) )
 #save(img_list, file = "../code/data/img_list_4d.rds")
 save(img_list, file = "../code/data/img_list.rds")
-a=img_list[[1]][150,,]
+a=img_list[[1]][150, , ]
 # plot(img_list)
 # library(misc3d)
 # library(rgl)
