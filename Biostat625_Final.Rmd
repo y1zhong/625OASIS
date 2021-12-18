@@ -38,7 +38,7 @@ Naive Bayes is a classifier based on applying Bayes' theorem with strong indepen
 
 
 **e) CNN**   
-To avoid information loss from 3-d images to 2-d matrix in above methods , we tried to employ convolutional neural network, which is a popular deep learning technique in medical imaging analysis. VGG is a deep learning architecture shown to be able to reach top accuracy in image classification tasks. It utilizes 3-d filters and fully connected layers that usually need hundreds of millions of parameters for a successfully trained model. In this project, we mimicked VGG16 with 16 layers, 1 millions parameters. We used Keras library in Python script and GPU in Google Colab to efficiently train our model. However, we did not find a meaningful train feature that has the discernibility to classify test data into correct diagnosis results. With several modified architectures, all the accuracies are around or below 50%. We did not report the evaluation here and left it for future exploration. 
+To avoid information loss from 3-d images to 2-d matrix in above methods , we tried to employ convolutional neural network, which is a popular deep learning technique in medical imaging analysis. Visual Geometry Group(VGG) is a deep learning architecture shown to be able to reach top accuracy in image classification tasks.[3] It utilizes 3-d filters and fully connected layers that usually need hundreds of millions of parameters for a successfully trained model. In this project, we mimicked VGG16 structure with around 16 layers and 50k parameters. We used Keras library in Python script and GPU in Google Colab to efficiently train our model. However, we did not find a meaningful train feature that has the discernibility to classify test data into correct diagnosis results. Even with several modified architectures including more than one million parameters, all the accuracies are around or below 50%. We did not report the evaluation here and left it for future exploration. 
 
 # Deliverable and Code Repository
 ### Shiny App
@@ -79,5 +79,5 @@ In conclusion, we compared the prediction of multiple classification models, and
 # References
 1. Alzheimer’s Association. 2016 Alzheimer’s disease facts and figures. Alzheimer’s Dementia. 2016, 12, 459–509.
 2. Open Access Series of Imaging Studies (OASIS): Cross-Sectional MRI Data in Young, Middle Aged, Nondemented, and Demented Older Adults. Marcus, DS, Wang, TH, Parker, J, Csernansky, JG, Morris, JC, Buckner, RL. Journal of Cognitive Neuroscience, 19, 1498-1507. doi: 10.1162/jocn.2007.19.9.1498. 
-
+3.3D Convolutional Neural Networks for Diagnosis of Alzheimer's Disease via Structural MRI. E. Yagis, L. Citi, S. Diciotti, C. Marzi, S. Workalemahu Atnafu and A. G. Seco De Herrera, 2020 IEEE 33rd International Symposium on Computer-Based Medical Systems (CBMS), 2020, pp. 65-70, doi: 10.1109/CBMS49503.2020.00020.
 
