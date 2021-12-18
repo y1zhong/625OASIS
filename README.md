@@ -12,9 +12,9 @@ Preliminary results are listed below:
 
 |  Model   | Lasso  | Ridge | LDA | SVM-L | RF | NB |
 |  ----  | ----  | ---- | ---- | ---- | ---- | ---- |
-| Sensitivity  | 0.60 | 0.60 | 0.63 | 0.49 | 0.65 | ??? |
-| Specificity  | 0.78 | 0.78 | 0.51 | 0.47 | 0.51 | ??? |
-| Accuracy  | 0.68 | 0.68 | 0.57 | 0.48 | 0.58 | ??? |
+| Sensitivity  | 0.60 | 0.75 | 0.50 | 0.50 | 0.50 | 0.60 |
+| Specificity  | 0.78 | 0.83 | 0.33 | 0.28 | 0.61 | 0.50 |
+| Accuracy  | 0.68 | 0.79 | 0.42 | 0.39 | 0.55 | 0.55 |
 
 
 ## Contributor:
