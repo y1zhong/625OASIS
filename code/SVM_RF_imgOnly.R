@@ -98,11 +98,11 @@ lda.pred = predict(lda.fit, Testing_data)
 
 lda.TrainAcc = max(na.omit(lda.fit$results$Accuracy))
 lda.TestAcc = calc_acc(predicted = lda.pred, actual = Testing_data$y)
+lda.pred=predict(lda.fit,Testing_data)
+lda.predprob=predict(lda.fit,Testing_data, type="prob")
 lda.cfmat = table(Prediction = lda.pred, Reference = True_cdr)
 lda.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = lda.pred)
-lda.res = list(lda.fit = lda.fit, lda.TrainAcc = lda.TrainAcc,
-               lda.TestAcc = lda.TestAcc, lda.cfmat = lda.cfmat,
-               lda.FPFNSeSp = lda.FPFNSeSp)
+lda.res = list(lda.fit=lda.fit,lda.TrainAcc=lda.TrainAcc,lda.TestAcc=lda.TestAcc,lda.cfmat=lda.cfmat,lda.FPFNSeSp=lda.FPFNSeSp,lda.predprob=lda.predprob)
 lda.res
 
 ## SVM with Linear Kernel
@@ -111,13 +111,12 @@ svm.lin.fit <- train(y~., data = Training_data, method = "svmLinear2",
                      trControl = ctrl, tuneLength = 10)
 #svm.lin.Yhat = svm.lin.fit$pred[svm.lin.fit$results$cost == 0.5,]$pred
 svm.lin.TrainAcc = max(svm.lin.fit$results["Accuracy"])
-svm.lin.pred=predict(svm.lin.fit, Testing_data)
+svm.lin.pred=predict(svm.lin.fit,Testing_data)
+svm.lin.predprob=predict(svm.lin.fit,Testing_data, type="prob")
 svm.lin.TestAcc = calc_acc(predicted = svm.lin.pred, actual = Testing_data$y)
 svm.lin.cfmat = table(Prediction = svm.lin.pred, Reference = True_cdr)
-svm.lin.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr, Beta = svm.lin.pred)
-svm.lin.res = list(svm.lin.fit = svm.lin.fit, svm.lin.TrainAcc = svm.lin.TrainAcc,
-                   svm.lin.TestAcc = svm.lin.TestAcc, svm.lin.cfmat = svm.lin.cfmat,
-                   svm.lin.FPFNSeSp = svm.lin.FPFNSeSp)
+svm.lin.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.lin.pred)
+svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc,svm.lin.cfmat= svm.lin.cfmat,svm.lin.FPFNSeSp=svm.lin.FPFNSeSp,svm.lin.predprob=svm.lin.predprob)
 svm.lin.res 
 
 ## SVM with Radial Kernel
@@ -126,13 +125,12 @@ svm.rad.fit <-train(y~., data = Training_data, method="svmRadial", trControl=ctr
                     tuneLength=10)
 #svm.rad.Yhat = svm.rad.fit$pred[svm.rad.fit$results$C == 0.5,]$pred
 svm.rad.TrainAcc = max(svm.rad.fit$results["Accuracy"])
-svm.rad.pred=predict(svm.rad.fit, Testing_data)
+svm.rad.pred=predict(svm.rad.fit,Testing_data)
+svm.rad.predprob=predict(svm.rad.fit,Testing_data, type="prob")
 svm.rad.TestAcc = calc_acc(predicted = svm.rad.pred, actual = Testing_data$y)
 svm.rad.cfmat = table(Prediction = svm.rad.pred, Reference = True_cdr)
 svm.rad.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.rad.pred)
-svm.rad.res = list(svm.rad.fit = svm.rad.fit, svm.rad.TrainAcc = svm.rad.TrainAcc,
-                   svm.rad.TestAcc = svm.rad.TestAcc, svm.rad.cfmat = svm.rad.cfmat,
-                   svm.rad.FPFNSeSp = svm.rad.FPFNSeSp)
+svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat,svm.rad.FPFNSeSp=svm.rad.FPFNSeSp,svm.rad.predprob=svm.rad.predprob)
 svm.rad.res
 
 ## Ramdom Forest
@@ -142,11 +140,11 @@ rf.fit <- train(y~., data = Training_data, method = "rf",
 
 rf.TrainAcc = max(rf.fit$results["Accuracy"])
 rf.pred=predict(rf.fit,Testing_data)
+rf.predprob=predict(rf.fit,Testing_data, type="prob")
 rf.TestAcc = calc_acc(predicted = rf.pred, actual = Testing_data$y)
 rf.cfmat = table(Prediction = rf.pred, Reference = True_cdr)
 rf.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = rf.pred)
-rf.res = list(rf.fit = rf.fit, rf.TrainAcc = rf.TrainAcc, rf.TestAcc = rf.TestAcc,
-              rf.cfmat = rf.cfmat, rf.FPFNSeSp = rf.FPFNSeSp)
+rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat,rf.FPFNSeSp=rf.FPFNSeSp,rf.predprob=rf.predprob)
 rf.res
 
 ## Naive Bayes
@@ -155,12 +153,12 @@ nb.fit <-train(y~., data = Training_data, method="nb",
                trControl = ctrl, tuneLength = 10)
 
 nb.TrainAcc = max(nb.fit$results["Accuracy"])
-nb.pred=predict(nb.fit, Testing_data)
+nb.pred=predict(nb.fit,Testing_data)
+nb.predprob=predict(nb.fit,Testing_data, type="prob")
 nb.TestAcc = calc_acc(predicted = nb.pred, actual = Testing_data$y)
 nb.cfmat = table(Prediction = nb.pred, Reference = True_cdr)
 nb.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = nb.pred)
-nb.res = list(nb.fit = nb.fit, nb.TrainAcc = nb.TrainAcc, nb.TestAcc = nb.TestAcc,
-              nb.cfmat = nb.cfmat,nb.FPFNSeSp = nb.FPFNSeSp)
+nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc,nb.cfmat=nb.cfmat,nb.FPFNSeSp=nb.FPFNSeSp,nb.predprob=nb.predprob)
 nb.res
 
 CDR_acc = data.frame(
