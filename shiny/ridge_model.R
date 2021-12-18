@@ -1,6 +1,6 @@
 library(caret)
 library(glmnet)
-load("C:/Users/xtk96/Desktop/625OASIS/data/img_list.rds")
+load("./data/img_list.rds")
 
 S.new <- array (NA, dim = c(176,208,length(img_list)))
 
@@ -12,7 +12,7 @@ for (i in 1:length(img_list)){
 
 S.new =  S.new[apply(S.new != 0, 1, any), apply(S.new != 0, 2, any) ,]
 
-data = read.csv("C:/Users/xtk96/Desktop/625OASIS/data/oasis_cross-sectional_filter.csv")
+data = read.csv("./data/oasis_cross-sectional_filter.csv")
 labels = data$CDR
 
 #--------------------------------------------------------------------
