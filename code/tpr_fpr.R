@@ -20,13 +20,13 @@ svm_ImgCS_rad_rate = rate(SVM_RF_ImgCS_result[["svm.rad.res"]][["svm.rad.predpro
 nb_ImgCS_rate = rate(SVM_RF_ImgCS_result[["nb.res"]][["nb.predprob"]])
 
 save(lda_ImgCS_rate, svm_ImgCS_lin_rate, svm_ImgCS_rad_rate,nb_ImgCS_rate,
-     file='result/SVM_RF_ImgCS_rate.RData')
+     file='result/SVM_RF_ImgCS_result_rate.RData')
 
 load("result/SVM_RF_ImgOnly_result.Rdata")
 truth = SVM_RF_ImgOnly_result[["pred_and_true"]][["True_cdr"]]
 lda_ImgOnly_rate = rate(SVM_RF_ImgOnly_result[["lda.res"]][["lda.predprob"]])
-svm_ImgOnly_lin_rate = rate(SVM_RF_ImgOnly_result[["svm.lin.res"]][["svm.lin.predprob"]])
-svm_ImgOnly_rad_rate = rate(SVM_RF_ImgOnly_result[["svm.rad.res"]][["svm.rad.predprob"]])
+svm_lin_ImgOnly_rate = rate(SVM_RF_ImgOnly_result[["svm.lin.res"]][["svm.lin.predprob"]])
+svm_rad_ImgOnly_rate = rate(SVM_RF_ImgOnly_result[["svm.rad.res"]][["svm.rad.predprob"]])
 nb_ImgOnly_rate = rate(SVM_RF_ImgOnly_result[["nb.res"]][["nb.predprob"]])
 
 save(lda_ImgOnly_rate, svm_lin_ImgOnly_rate, svm_rad_ImgOnly_rate,nb_ImgOnly_rate,
