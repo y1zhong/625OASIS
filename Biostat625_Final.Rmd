@@ -45,7 +45,7 @@ To avoid information loss from 3-d images to 2-d matrix in above methods , we tr
 
 # Deliverable and Code Repository
 ### Shiny App
-Shiny Application We built our Shiny application using the ridge LR as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by accessing though 'shinyapps.io', https://j3z4te-tiankai-xie.shinyapps.io/shiny/, on the R console. Packages like Shiny and oro.nifti must be installed before this app can be run.
+Shiny Application We built our Shiny application using the ridge LR as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by accessing though 'shinyapps.io', https://j3z4te-tiankai-xie.shinyapps.io/shiny/, and a workable input called myMRI.zip could be found in shiny folder. Packages like Shiny and oro.nifti must be installed before this app can be run.
  
 ### GitHub
 A GitHub repository is created to store, update, display, and share the results of our project. Here is the link: https://github.com/y1zhong/625OASIS
