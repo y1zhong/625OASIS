@@ -30,8 +30,13 @@ mi.temp.oasis_f = complete(mi.oasis_f, "all")
 oasis_csdt = mi.temp.oasis_f[[pos]][, c(2 : 5, 7)]
 labels = oasis_csdt$CDR
 
+<<<<<<< HEAD
+n = length(img_list)
+num_lst = 1:n
+=======
 n = nrow(S.new)
 num_lst = 1 : n
+>>>>>>> 7acbc5b9b10df07d0276fa460a6a14d7edfc1ea4
 set.seed(123)
 random_sample <- createDataPartition(num_lst, p = 0.8, list = FALSE)
 

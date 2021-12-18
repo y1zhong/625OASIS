@@ -66,8 +66,8 @@ table(test.Y)
 #return 2D array
 prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0) {
   dims = dim(images)
-  X.pos = t( matrix(images[, , labels %in% posLabel], nrow=dims[1] * dims[2]) ) ## n1 x (137x169)
-  X.neg = t( matrix(images[, , labels %in% negLabel], nrow=dims[1] * dims[2]) ) ## n1 x (137x169)
+  X.pos = t( matrix(images[, , labels %in% posLabel], nrow = dims[1] * dims[2]) ) ## n1 x (137x169)
+  X.neg = t( matrix(images[, , labels %in% negLabel], nrow = dims[1] * dims[2]) ) ## n1 x (137x169)
   return( list(X=rbind(X.pos, X.neg),
               y = c(rep(1,nrow(X.pos)), rep(0,nrow(X.neg)))))
 }
@@ -233,22 +233,21 @@ save(cv.fit.demo, demo.fit, confusion.demo, roc.demo, file = "Ridge_ImgCS.RData"
 Selecting More than one Slice
 ==============================================================================
 ```{r}
-S.five <- array (NA, dim = c(176, 1040, length(img_list)))
+S.five <- array (NA, dim = c(352, 416, length(img_list)))
 
 for (i in 1 : length(img_list)){            #select slice 88 and create array 176x208x198
   a = img_list[[i]]
-  test1 = a[, , 100]
   test2 = a[, , 95]
   test3 = a[, , 90]
   test4 = a[, , 85]
   test5 = a[, , 80]
-  S.five[, , i] = cbind(test1,test2,test3,test4,test5)
+  S.five[, , i] = rbind(cbind(test2,test3), cbind(test4,test5))
 }
 
 #--------------------------------------------------------------------
 #   Remove rows and columns with all 0
 #--------------------------------------------------------------------
-S.five =  S.five[apply(S.five != 0, 1, any),   #137x833x198
+S.five =  S.five[apply(S.five != 0, 1, any),   #274x340x198
                apply(S.five != 0, 2, any), ]
 
 ```
@@ -285,8 +284,6 @@ cv.fit.five = cv.glmnet(combined.2$X, combined.2$y, family = "binomial",
 param.five = cv.fit.five$lambda.min             #best lambda parameter
 coef.five  = coef(cv.fit.five, s = "lambda.min")
 toc()
-
-
 
 ```
 
