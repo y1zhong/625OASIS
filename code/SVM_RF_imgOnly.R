@@ -30,7 +30,9 @@ mi.temp.oasis_f = complete(mi.oasis_f, "all")
 oasis_csdt = mi.temp.oasis_f[[pos]][, c(2 : 5, 7)]
 labels = oasis_csdt$CDR
 
-
+#--------------------------------------------------------------------
+#   Creating training and testing data
+#--------------------------------------------------------------------
 n = length(img_list)
 num_lst = 1:n
 set.seed(123)
@@ -57,6 +59,9 @@ prep_binary_classification = function(images, labels, posLabel = 1, negLabel = 0
 trn = prep_binary_classification(train.X, train.Y, 1, 0)
 tst = prep_binary_classification(test.X, test.Y, 1, 0)
 
+#--------------------------------------------------------------------
+# Reduse dimention by PCA
+#--------------------------------------------------------------------
 pca.X = prcomp(trn$X)
 trn_X <- predict(pca.X, newdata = trn$X)
 tst_X <- predict(pca.X, newdata =tst$X)
@@ -69,7 +74,9 @@ calc_acc = function(actual, predicted) {
   mean(actual == predicted)
 }
 
-# Sensitivity Analysis
+#--------------------------------------------------------------------
+#   Sensitivity Analysis
+#--------------------------------------------------------------------
 FPFNSeSp <- function(TrueBeta = TrueBeta, Beta = Beta){
   FPR = length(which(TrueBeta == 0 & Beta != 0)) / length(TrueBeta)
   FNR= length(which(TrueBeta != 0 & Beta == 0)) / length(TrueBeta)
@@ -82,7 +89,9 @@ ctrl <- trainControl(method = "cv", number=10,
                      savePredictions=TRUE, classProbs=TRUE, 
                      allowParallel = T,verboseIter = T) 
 
-## LDA classification
+#--------------------------------------------------------------------
+#   LDA classification
+#--------------------------------------------------------------------
 library(MASS)
 set.seed(123)
 lda.fit <-train(x = Training_data[, - 1], y = Training_data$y, data = Training_data, 
@@ -106,7 +115,9 @@ lda.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = lda.pred)
 lda.res = list(lda.fit=lda.fit,lda.TrainAcc=lda.TrainAcc,lda.TestAcc=lda.TestAcc,lda.cfmat=lda.cfmat,lda.FPFNSeSp=lda.FPFNSeSp,lda.predprob=lda.predprob)
 lda.res
 
-## SVM with Linear Kernel
+#--------------------------------------------------------------------
+#   SVM with Linear Kernel
+#-------------------------------------------------------------------- 
 set.seed(123)
 svm.lin.fit <- train(y~., data = Training_data, method = "svmLinear2", 
                      trControl = ctrl, tuneLength = 10)
@@ -120,7 +131,9 @@ svm.lin.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.lin.pred)
 svm.lin.res = list(svm.lin.fit=svm.lin.fit,svm.lin.TrainAcc=svm.lin.TrainAcc,svm.lin.TestAcc=svm.lin.TestAcc,svm.lin.cfmat= svm.lin.cfmat,svm.lin.FPFNSeSp=svm.lin.FPFNSeSp,svm.lin.predprob=svm.lin.predprob)
 svm.lin.res 
 
-## SVM with Radial Kernel
+#--------------------------------------------------------------------
+#   SVM with Radial Kernel
+#-------------------------------------------------------------------- 
 set.seed(123)
 svm.rad.fit <-train(y~., data = Training_data, method="svmRadial", trControl=ctrl,
                     tuneLength=10)
@@ -134,7 +147,9 @@ svm.rad.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = svm.rad.pred)
 svm.rad.res = list(svm.rad.fit=svm.rad.fit,svm.rad.TrainAcc=svm.rad.TrainAcc,svm.rad.TestAcc=svm.rad.TestAcc,svm.rad.cfmat=svm.rad.cfmat,svm.rad.FPFNSeSp=svm.rad.FPFNSeSp,svm.rad.predprob=svm.rad.predprob)
 svm.rad.res
 
-## Ramdom Forest
+#--------------------------------------------------------------------
+#   Random Forest
+#-------------------------------------------------------------------- 
 set.seed(123)
 rf.fit <- train(y~., data = Training_data, method = "rf", 
                 trControl = ctrl,tuneLength = 10)
@@ -148,7 +163,9 @@ rf.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = rf.pred)
 rf.res = list(rf.fit=rf.fit,rf.TrainAcc=rf.TrainAcc,rf.TestAcc=rf.TestAcc,rf.cfmat=rf.cfmat,rf.FPFNSeSp=rf.FPFNSeSp,rf.predprob=rf.predprob)
 rf.res
 
-## Naive Bayes
+#--------------------------------------------------------------------
+#   Naive Bayes
+#--------------------------------------------------------------------
 set.seed(123)
 nb.fit <-train(y~., data = Training_data, method="nb",
                trControl = ctrl, tuneLength = 10)
@@ -162,6 +179,9 @@ nb.FPFNSeSp = FPFNSeSp(TrueBeta = True_cdr,Beta = nb.pred)
 nb.res = list(nb.fit=nb.fit,nb.TrainAcc=nb.TrainAcc,nb.TestAcc=nb.TestAcc,nb.cfmat=nb.cfmat,nb.FPFNSeSp=nb.FPFNSeSp,nb.predprob=nb.predprob)
 nb.res
 
+#--------------------------------------------------------------------
+#   Accuracy
+#--------------------------------------------------------------------
 CDR_acc = data.frame(
   Model = c("LDA", "SVM linear",  "SVM radial","Random Forest","Naive Bayes"),
   TrainAccuracy = c(lda.TrainAcc, svm.lin.TrainAcc, svm.rad.TrainAcc, 
@@ -183,4 +203,7 @@ SVM_RF_ImgOnly_result = list(lda.res = lda.res, svm.lin.res = svm.lin.res,
                              nb.res = nb.res, CDR_acc = CDR_acc, 
                              pred_and_true = pred_and_true)
 
+#--------------------------------------------------------------------
+#   Save results
+#--------------------------------------------------------------------
 save(SVM_RF_ImgOnly_result, file ="./result/SVM_RF_ImgOnly_result.Rdata")

@@ -33,26 +33,26 @@ Logistic regression was preferred over linear discriminant analysis (LDA) becaus
 **b) Random Forest (RF)**   
 Random forest is an ensemble learning method. For classification tasks, its output is the class selected by most trees. It doesn't overfit with more features and its efficiency is particularly notable in large data sets. The random forest method was called from ``randomForest``.
 
-
 **c) Support Vector Machine (SVM)**   
 Support vector machine is a supervised learning method. It is effective in high dimensional spaces and in cases where number of dimensions is greater than the number of samples. It is also memory efficient since it uses a subset of training points in the decision function, known as support vectors. Both linear and radial kernel were used for regularization. The SVM with linear kernel was called from  ``e1071`` and the SVM with radial kernel was called from ``kernlab``.  
 
 **d) Naive Bayes**  
-Naive Bayes is a  classifier based on applying Bayes' theorem with strong independence assumptions between the features. It coupled simple Bayesian network models with kernel density estimation, and can achieve higher accuracy levels.Unlike ther types of classifiers wihch use expensive iterative approximation, its maximum-likelihood training can be done by evaluating a closed-form expression, which only takes linear time. The Naive Bayes was called from ``klaR``.
+Naive Bayes is a classifier based on applying Bayes' theorem with strong independence assumptions between the features. It coupled simple Bayesian network models with kernel density estimation, and can achieve higher accuracy levels.Unlike ther types of classifiers wihch use expensive iterative approximation, its maximum-likelihood training can be done by evaluating a closed-form expression, which only takes linear time. The Naive Bayes was called from ``klaR``.
 
 
 **e) CNN**   
-
+To avoid information loss from 3-d images to 2-d matrix in above methods , we tried to employ convolutional neural network, which is a popular deep learning technique in medical imaging analysis. VGG is a deep learning architecture shown to be able to reach top accuracy in image classification tasks. It utilizes 3-d filters and fully connected layers that usually need hundreds of millions of parameters for a successfully trained model. In this project, we mimicked VGG16 with 16 layers, 1 millions parameters. We used Keras library in Python script and GPU in Google Colab to efficiently train our model. However, we did not find a meaningful train feature that has the discernibility to classify test data into correct diagnosis results. With several modified architectures, all the accuracies are around or below 50%. We did not report the evaluation here and left it for future exploration. 
 
 # Deliverable and Code Repository
 ### Shiny App
-Shiny Application We built our Shiny application using the ridge LR as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by running this command, shiny::runGitHub('625OASIS','y1zhong', subdir = 'shiny'), on the R console. Packages like Shiny and oro.nifti must be installed before this app can be run.
+Shiny Application We built our Shiny application using the ridge LR as our classifier embedded behind the dashboard. This means that the dashboard can take patients MRI data and some demographic and clinical input to predicts of Dementia diagnosis using CNN model. The Shiny application can be viewed by accessing though 'shinyapps.io', https://j3z4te-tiankai-xie.shinyapps.io/shiny/, and a workable input called myMRI.zip could be found in shiny folder. Packages like Shiny and oro.nifti must be installed before this app can be run.
  
 ### GitHub
 A GitHub repository is created to store, update, display, and share the results of our project. Here is the link: https://github.com/y1zhong/625OASIS
 
 # Challenges 
 
+Given the high dimensional structure of our data, we ran into several problems while attempting to train models on local environment. Specifically, the RF and SVM methods failed due to stack overflow error. We were able to resolve this problem by training the models on the Biostatistics Cluster. In addition, as CNN was a computationally demanding method, its initial runtime on the Biostatistics Cluster took approximately 40 hours. In order to improve the performance, CNN was trained on Google Colab with Graphics Processing Unit (GPU) accelerator. As a result, the runtime was reduced to approximately 30 minutes. 
 
 
 # Evaluation
