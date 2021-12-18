@@ -56,12 +56,15 @@ Given the high dimensional structure of our data, we ran into several problems w
 
 To evaluate the performance of each model, we compared test sensitivity, specificity, and accuracy (Table 2). When only image data was included in the model, the best classification model was Ridge regression with the highest accuracy (0.79), sensitivity (0.75), and specificity (0.83). Figure 2 presented the ROC curve for each model which also indicated that Ridge regression was the best model to predict Alzheimer dementia. Lasso regression also performed well with a relative high accuracy that correctly classified 68% of the MRI. However, RF and LDA had a higher sensitivity than Lasso regression (0.65 and 0.63 respectively). The purpose of our analysis was to correctly predict AD, so sensitivity was more important than accuracy which indicated the percentage of true positive among test cases. We further included demographic information in our models, but the performance of prediction was not improved and some RF even had 28% decrease in sensitivity. 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,fig.cap="ROC curves of selected models", fig.align='center', out.width='60%', out.height='40%'}
 library(knitr)
+library(kableExtra)
 # library(kableExtra)
 load("./tables and figures/result_table.RData")
-knitr::kable(result_table, align="c", col.names = NULL)
-      # caption = "Table 2 Performance of models in sensitivity, specificity, and accuracy")
+kbl(result_table,"latex", booktabs = T, align="c", col.names = NULL) %>%
+  kable_styling( full_width = F, position = "left") %>%
+  add_header_above(c("","Image only"=6, "Image+CS"=5))
+knitr::include_graphics("./tables and figures/ROC.png")
 ```
 
 
