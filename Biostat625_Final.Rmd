@@ -52,6 +52,7 @@ A GitHub repository is created to store, update, display, and share the results 
 
 # Challenges 
 
+Given the high dimensional structure of our data, we ran into several problems during analysis
 
 
 # Evaluation
