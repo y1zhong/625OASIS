@@ -33,11 +33,7 @@ Logistic regression was preferred over linear discriminant analysis (LDA) becaus
 **b) Random Forest (RF)**   
 Random forest is an ensemble learning method. For classification tasks, its output is the class selected by most trees. It doesn't overfit with more features and its efficiency is particularly notable in large data sets. The random forest method was called from ``randomForest``.
 
-<<<<<<< HEAD
-**c) support Vector Machine (SVM)**   
-=======
 **c) Support Vector Machine (SVM)**   
->>>>>>> 8455cd3fd0d13eb2f095a1e2fb2e3e262c5cb930
 Support vector machine is a supervised learning method. It is effective in high dimensional spaces and in cases where number of dimensions is greater than the number of samples. It is also memory efficient since it uses a subset of training points in the decision function, known as support vectors. Both linear and radial kernel were used for regularization. The SVM with linear kernel was called from  ``e1071`` and the SVM with radial kernel was called from ``kernlab``.  
 
 **d) Naive Bayes**  
@@ -56,7 +52,7 @@ A GitHub repository is created to store, update, display, and share the results 
 
 # Challenges 
 
-Given the high dimensional structure of our data, we ran into several problems during analysis
+Given the high dimensional structure of our data, we ran into several problems while attempting to train models on local environment. Specifically, the RF and SVM methods failed due to stack overflow error. We were able to resolve this problem by training the models on the Biostatistics Cluster. In addition, as CNN was a computationally demanding method, its initial runtime on the Biostatistics Cluster took approximately 40 hours. In order to improve the performance, CNN was trained on Google Colab with Graphics Processing Unit (GPU) accelerator. As a result, the runtime was reduced to approximately 30 minutes. 
 
 
 # Evaluation
