@@ -17,7 +17,7 @@ load('./tables and figures/summary_afterImp')
 sum_tb_after_imp
 ```
 
-# Methods and Results
+# Methods
 ```{r,echo=FALSE,out.height = '120px', fig.cap="MRI scan of CN (left) and dementia (right) patients", fig.align='center'}
 knitr::include_graphics(c("./tables and figures/MRI.png"))     
 ```
@@ -33,7 +33,7 @@ Logistic regression was preferred over linear discriminant analysis (LDA) becaus
 **b) Random Forest (RF)**   
 Random forest is an ensemble learning method. For classification tasks, its output is the class selected by most trees. It doesn't overfit with more features and its efficiency is particularly notable in large data sets. The random forest method was called from ``randomForest``.
 
-**c) support Vector Machine (SVM)**   
+**c) Support Vector Machine (SVM)**   
 Support vector machine is a supervised learning method. It is effective in high dimensional spaces and in cases where number of dimensions is greater than the number of samples. It is also memory efficient since it uses a subset of training points in the decision function, known as support vectors. Both linear and radial kernel were used for regularization. The SVM with linear kernel was called from  ``e1071`` and the SVM with radial kernel was called from ``kernlab``.  
 
 **d) Naive Bayes**  
@@ -49,6 +49,10 @@ Shiny Application We built our Shiny application using the ridge LR as our class
  
 ### GitHub
 A GitHub repository is created to store, update, display, and share the results of our project. Here is the link: https://github.com/y1zhong/625OASIS
+
+# Challenges 
+
+
 
 # Evaluation
 
@@ -69,6 +73,7 @@ knitr::kable(result_table, align="c", col.names = NULL)
 In conclusion, we compared the prediction of multiple classification models, and the Ridge regression outperformed others in terms of accuracy, sensitivity, and specificity. Comparing to literature, our analyses had several important strengths. Some literature may have outstanding accuracy that is more than 95% when comparing MRI of Alzheimer's dementia with healthy control in young adults. However, young adults were not at risk of developing AD and using their MRI as control would introduce bias and over predict the result. Our analysis only included older adults which would be more practical to distinguish AD and healthy aging brain. Secondly, our outcome AD was balanced among cases and controls which would increase our accuracy. However, accuracy of AD prediction was different by the stages of AD. Since there were no significant symptoms at early AD stage when the degeneration of the brain had begun, it was difficult to diagnosis AD and more likely to discover AD at later stages. Therefore, accuracy would be differentiated by the level of comparison and distinguishing MCI from healthy aging would be the most difficult. Past classification models showed much lower accuracy between 40% to 60%. In our analysis, we combined MCI, AD, and severe AD as one group which made prediction harder with lower accuracy. Our CNN method was the most challenging model as it not only required large sample size, but also advanced computing environment such as cluster computing or GPU computing to incorporate the high-dimensional structure. Many research teams already recruited extraordinary engineers and computer science expertise to improve the algorithm, but with less focus on important biomarkers of AD such as APOE and CSF and other important clinical information. Future research should consider including more biostatistics, neurology, and epidemiology field to create multi-disciplinary research.  
 
 # Contributions
+
 
 # References
 1. Alzheimer’s Association. 2016 Alzheimer’s disease facts and figures. Alzheimer’s Dementia. 2016, 12, 459–509.
