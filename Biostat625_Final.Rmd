@@ -38,11 +38,11 @@ Random forest is an ensemble learning method. For classification tasks, its outp
 Support vector machine is a supervised learning method. It is effective in high dimensional spaces and in cases where number of dimensions is greater than the number of samples. It is also memory efficient since it uses a subset of training points in the decision function, known as support vectors. Both linear and radial kernel were used for regularization. The SVM with linear kernel was called from  ``e1071`` and the SVM with radial kernel was called from ``kernlab``.  
 
 **d) Naive Bayes**  
-Naive Bayes is a  classifier based on applying Bayes' theorem with strong independence assumptions between the features. It coupled simple Bayesian network models with kernel density estimation, and can achieve higher accuracy levels.Unlike ther types of classifiers wihch use expensive iterative approximation, its maximum-likelihood training can be done by evaluating a closed-form expression, which only takes linear time. The Naive Bayes was called from ``klaR``.
+Naive Bayes is a classifier based on applying Bayes' theorem with strong independence assumptions between the features. It coupled simple Bayesian network models with kernel density estimation, and can achieve higher accuracy levels.Unlike ther types of classifiers wihch use expensive iterative approximation, its maximum-likelihood training can be done by evaluating a closed-form expression, which only takes linear time. The Naive Bayes was called from ``klaR``.
 
 
 **e) CNN**   
-
+To avoid information loss from 3-d images to 2-d matrix in above methods , we tried to employ convolutional neural network, which is a popular deep learning technique in medical imaging analysis. VGG is a deep learning architecture shown to be able to reach top accuracy in image classification tasks. It utilizes 3-d filters and fully connected layers that usually need hundreds of millions of parameters for a successfully trained model. In this project, we mimicked VGG16 with 16 layers, 1 millions parameters. We used Keras library in Python script and GPU in Google Colab to efficiently train our model. However, we did not find a meaningful train feature that has the discernibility to classify test data into correct diagnosis results. With several modified architectures, all the accuracies are around or below 50%. We did not report the evaluation here and left it for future exploration. 
 
 # Deliverable and Code Repository
 ### Shiny App
