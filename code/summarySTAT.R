@@ -19,7 +19,9 @@ pos = sample(1:5,1)
 mi.oasis_f = mice(oasis_f, m=5, printFlag =FALSE)
 mi.temp.oasis_f = complete(mi.oasis_f,"all")
 new_oasis = mi.temp.oasis_f[[pos]][, c(2:5,7)]
-labels = new_oasis$CDR
+#labels = c("Cognitive Normal", "Dementia")
+new_oasis$CDR = factor(new_oasis$CDR, labels = c("Cognitive Normal", "Dementia"))
 
-sum_tb_after_imp = tbl_summary(new_oasis, by = 'CDR')%>% add_overall()
+sum_tb_after_imp = tbl_summary(new_oasis, 
+                               by = 'CDR')%>% add_overall()
 save(sum_tb_after_imp, file = './tables and figures/summary_afterImp')
