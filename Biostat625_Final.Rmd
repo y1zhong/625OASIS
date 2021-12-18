@@ -61,7 +61,7 @@ library(knitr)
 library(kableExtra)
 # library(kableExtra)
 load("./tables and figures/result_table.RData")
-kbl(result_table,"latex", booktabs = T, align="c", col.names = NULL) %>%
+kbl(result_table,"latex", booktabs = T, align="c", col.names = NULL, caption = "Table 2. Classification results of sensitivity, specificity, and accuracy") %>%
   kable_styling( full_width = F, position = "left") %>%
   add_header_above(c("","Image only"=6, "Image+CS"=5))
 knitr::include_graphics("./tables and figures/ROC.png")
