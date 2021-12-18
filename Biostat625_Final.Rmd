@@ -80,5 +80,5 @@ All members contributed in drafting the report, and each group member contribute
 # References
 1. Alzheimer’s Association. 2016 Alzheimer’s disease facts and figures. Alzheimer’s Dementia. 2016, 12, 459–509.
 2. Open Access Series of Imaging Studies (OASIS): Cross-Sectional MRI Data in Young, Middle Aged, Nondemented, and Demented Older Adults. Marcus, DS, Wang, TH, Parker, J, Csernansky, JG, Morris, JC, Buckner, RL. Journal of Cognitive Neuroscience, 19, 1498-1507. doi: 10.1162/jocn.2007.19.9.1498. 
-
+3.3D Convolutional Neural Networks for Diagnosis of Alzheimer's Disease via Structural MRI. E. Yagis, L. Citi, S. Diciotti, C. Marzi, S. Workalemahu Atnafu and A. G. Seco De Herrera, 2020 IEEE 33rd International Symposium on Computer-Based Medical Systems (CBMS), 2020, pp. 65-70, doi: 10.1109/CBMS49503.2020.00020.
 
