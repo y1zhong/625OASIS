@@ -18,5 +18,5 @@ Preliminary results are listed below:
 
 
 ## Contributor:
-Coathor: Boya Jiang, Chen Chen, Tiankai Xie, Yuan Zhong.
+Co-author: Boya Jiang, Chen Chen, Tiankai Xie, Yuan Zhong.
 
